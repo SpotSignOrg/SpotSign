@@ -45,17 +45,6 @@ pub fn sign_message(private_key: String, public_key: String, message: String) ->
     base64::encode_config_buf(&signed_bytes[60..64], base64::URL_SAFE, &mut signature);
 
     let js_object = js_sys::Object::new();
-
-    let mut signature_decoded = Vec::new();
-    match base64::decode_config_buf(&signature, base64::URL_SAFE, &mut signature_decoded) {
-        Ok(_) => (),
-        Err(e) => {
-            js_sys::Reflect::set(&js_object, &"verified".into(), &format!("Unable to parse Signature: {} {} {:?}", e, signature, &signed_bytes[..]).into()).unwrap();
-            return js_object;
-        }
-
-    }
-
     js_sys::Reflect::set(&js_object, &"signature".into(), &signature.into()).unwrap();
     js_object
 }
@@ -83,14 +72,6 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         }
 
     }
-    // match base64::decode_config_buf(&signature[32..], base64::STANDARD, &mut signature_decoded) {
-    //     Ok(_) => (),
-    //     Err(e) => {
-    //         js_sys::Reflect::set(&js_verified, &"verified".into(), &format!("Unable to parse Signature[32..]: {}", e).into()).unwrap();
-    //         return js_verified;
-    //     }
-
-    // }
 
     let public_key = match PublicKey::from_bytes(&public_key_decoded[..]) {
         Ok(v) => v,
@@ -100,9 +81,15 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         }
     };
 
-    let signature = Signature::from_bytes(&signature_decoded[..]).unwrap();
-    let verified = public_key.verify(message.as_bytes(), &signature);
+    let signature = match Signature::from_bytes(&signature_decoded[..]) {
+        Ok(v) => v,
+        Err(_) => {
+            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to parse Signature".into()).unwrap();
+            return js_verified; 
+        }
+    };
 
+    let verified = public_key.verify(message.as_bytes(), &signature);
 
     match verified {
         Ok(_) => js_sys::Reflect::set(&js_verified, &"verified".into(), &"Verified!".into()).unwrap(),
@@ -110,20 +97,3 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     };
     js_verified
 }
-// #[wasm_bindgen]
-// pub fn greet(name: &str) {
-//     console_error_panic_hook::set_once();
-
-
-
-//     let message: &[u8] = b"This message is signed.";
-//     let signature: Signature = keypair.sign(message);
-
-//     assert!(keypair.verify(message, &signature).is_ok());
-
-//     let public_key: PublicKey = keypair.public;
-//     assert!(public_key.verify(message, &signature).is_ok());
-
-//     let public_key_bytes = &public_key.to_bytes();
-//     let public_key_string = encode(public_key_bytes);
-// }
