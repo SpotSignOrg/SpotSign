@@ -38,9 +38,8 @@ pub fn sign_message(private_key: String, public_key: String, message: String) ->
     let keypair: Keypair = Keypair::from_bytes(&keypair_bytes[..]).unwrap();
     let signed = keypair.sign(message.as_bytes());
 
-    let signed_bytes = signed.to_bytes();
     let mut signature = String::new();
-    base64::encode_config_buf(&signed_bytes[..], base64::URL_SAFE, &mut signature);
+    base64::encode_config_buf(&signed.to_bytes()[..], base64::URL_SAFE, &mut signature);
 
     let js_object = js_sys::Object::new();
     js_sys::Reflect::set(&js_object, &"signature".into(), &signature.into()).unwrap();
