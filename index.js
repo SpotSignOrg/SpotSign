@@ -63,18 +63,24 @@ function compress(string) {
   }
 
 rust
-  .then(m => {
-      let keys = m.get_keys();
-      console.log(keys);
-      document.getElementById("privatekey").value = keys.private_key;
-      document.getElementById("publickey").value = keys.public_key;
-      document.getElementById("sign").addEventListener("click", e => {
-          let message = document.getElementById("message").value;
-          let signature = m.sign_message(keys.private_key, keys.public_key, message);
-          let compressed_signature = compress(signature.signature);
-          document.getElementById("signature").value = compressed_signature;
-
-      })
-
-  })
-  .catch(console.error);
+    .then(m => {
+        let keys = m.get_keys();
+        console.log(keys);
+        document.getElementById("privatekey").value = keys.private_key;
+        document.getElementById("publickey").value = keys.public_key;
+        document.getElementById("sign").addEventListener("click", e => {
+            let message = document.getElementById("message").value;
+            let signature = m.sign_message(keys.private_key, keys.public_key, message);
+            console.log(signature);
+            let compressed_signature = compress(signature.signature);
+            document.getElementById("signature").value = compressed_signature;
+            // document.getElementById("signature").value = signature.signature;
+        })
+        document.getElementById("verify").addEventListener("click", e => {
+            let message = document.getElementById("message").value;
+            let signature = decompress(document.getElementById("signature").value);
+            let verification = m.verify_message(keys.public_key, signature, message);
+            document.getElementById("verification").innerHTML = verification.verified;
+        })
+    })
+    .catch(console.error);
