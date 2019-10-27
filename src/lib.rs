@@ -1,10 +1,10 @@
+use base64;
 use ed25519_dalek::Keypair;
 use ed25519_dalek::PublicKey;
 use ed25519_dalek::Signature;
+use js_sys;
 use rand::rngs::OsRng;
 use wasm_bindgen::prelude::*;
-use base64;
-use js_sys;
 
 #[wasm_bindgen]
 pub fn get_keys() -> js_sys::Object {
@@ -21,8 +21,6 @@ pub fn get_keys() -> js_sys::Object {
     js_sys::Reflect::set(&js_keys, &"public_key".into(), &public_key.into()).unwrap();
     js_keys
 }
-
-
 
 #[wasm_bindgen]
 pub fn sign_message(private_key: String, public_key: String, message: String) -> js_sys::Object {
@@ -54,7 +52,12 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     let public_key_decoded = match base64::decode(&public_key) {
         Ok(v) => v,
         Err(_) => {
-            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to base64 decode Public Key".into()).unwrap();
+            js_sys::Reflect::set(
+                &js_verified,
+                &"verified".into(),
+                &"Unable to base64 decode Public Key".into(),
+            )
+            .unwrap();
             return js_verified;
         }
     };
@@ -63,16 +66,25 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     match base64::decode_config_buf(&signature, base64::URL_SAFE, &mut signature_decoded) {
         Ok(_) => (),
         Err(e) => {
-            js_sys::Reflect::set(&js_verified, &"verified".into(), &format!("Unable to parse Signature: {} {}", e, signature).into()).unwrap();
+            js_sys::Reflect::set(
+                &js_verified,
+                &"verified".into(),
+                &format!("Unable to parse Signature: {} {}", e, signature).into(),
+            )
+            .unwrap();
             return js_verified;
         }
-
     }
 
     let public_key = match PublicKey::from_bytes(&public_key_decoded[..]) {
         Ok(v) => v,
         Err(_) => {
-            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to parse Public Key".into()).unwrap();
+            js_sys::Reflect::set(
+                &js_verified,
+                &"verified".into(),
+                &"Unable to parse Public Key".into(),
+            )
+            .unwrap();
             return js_verified;
         }
     };
@@ -80,7 +92,12 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     let signature = match Signature::from_bytes(&signature_decoded[..]) {
         Ok(v) => v,
         Err(_) => {
-            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to parse Signature".into()).unwrap();
+            js_sys::Reflect::set(
+                &js_verified,
+                &"verified".into(),
+                &"Unable to parse Signature".into(),
+            )
+            .unwrap();
             return js_verified;
         }
     };
@@ -88,8 +105,15 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     let verified = public_key.verify(message.as_bytes(), &signature);
 
     match verified {
-        Ok(_) => js_sys::Reflect::set(&js_verified, &"verified".into(), &"Verified!".into()).unwrap(),
-        Err(_) => js_sys::Reflect::set(&js_verified, &"verified".into(), &"Verification Failed!".into()).unwrap()
+        Ok(_) => {
+            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Verified!".into()).unwrap()
+        }
+        Err(_) => js_sys::Reflect::set(
+            &js_verified,
+            &"verified".into(),
+            &"Verification Failed!".into(),
+        )
+        .unwrap(),
     };
     js_verified
 }

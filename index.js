@@ -1,7 +1,7 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import {toUtf32, fromUtf32} from './encode';
+import { toUtf32, fromUtf32 } from './encode';
 
 const rust = import('./pkg');
 
