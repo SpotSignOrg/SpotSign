@@ -12,6 +12,7 @@ rand = { version = "0.6.5", features = ["wasm-bindgen"] }
 wasm-bindgen = "0.2.52"
 console_error_panic_hook = "0.1.6"
 base64 = "0.11.0"
+js-sys = "0.3.29"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>SpotSign</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row my-4">
+                <div class="col">
+                    <h1>SpotSign</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="message">Private Key</label>
+                        <input id="privatekey" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="message">Public Key</label>
+                        <input id="publickey" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <input class="form-control" id="message">
+                    </div>
+                </div>   
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="signature">Signature</label>
+                        <input id="signature" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <button id="sign" class="btn btn-primary">Sign</button>
+                        <button id="verify" class="btn btn-primary">Verify</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="./index.js"></script>
+    </body>
+</html>
