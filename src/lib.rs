@@ -37,12 +37,9 @@ pub fn sign_message(private_key: String, public_key: String, message: String) ->
 
     let keypair: Keypair = Keypair::from_bytes(&keypair_bytes[..]).unwrap();
     let signed = keypair.sign(message.as_bytes());
-    
-    let signed_bytes = &signed.to_bytes();
+
     let mut signature = String::new();
-    base64::encode_config_buf(&signed_bytes[..30], base64::URL_SAFE, &mut signature);
-    base64::encode_config_buf(&signed_bytes[30..60], base64::URL_SAFE, &mut signature);
-    base64::encode_config_buf(&signed_bytes[60..64], base64::URL_SAFE, &mut signature);
+    base64::encode_config_buf(&signed.to_bytes()[..], base64::URL_SAFE, &mut signature);
 
     let js_object = js_sys::Object::new();
     js_sys::Reflect::set(&js_object, &"signature".into(), &signature.into()).unwrap();
@@ -60,7 +57,7 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         Err(_) => {
             js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to base64 decode Public Key".into()).unwrap();
             return js_verified;
-        } 
+        }
     };
 
     let mut signature_decoded = Vec::new();
@@ -85,7 +82,7 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         Ok(v) => v,
         Err(_) => {
             js_sys::Reflect::set(&js_verified, &"verified".into(), &"Unable to parse Signature".into()).unwrap();
-            return js_verified; 
+            return js_verified;
         }
     };
 
