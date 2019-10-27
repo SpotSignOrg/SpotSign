@@ -16,3 +16,7 @@ Cargo.lock
 
 /target
 #**/*.rs.bk
+
+.DS_Store
+dist/
+node_modules/
