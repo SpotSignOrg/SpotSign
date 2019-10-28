@@ -6,6 +6,8 @@ use js_sys;
 use rand::rngs::OsRng;
 use wasm_bindgen::prelude::*;
 
+const DATETIME_LEN: usize = 24;
+
 #[wasm_bindgen]
 pub fn get_keys() -> js_sys::Object {
     console_error_panic_hook::set_once();
@@ -23,7 +25,12 @@ pub fn get_keys() -> js_sys::Object {
 }
 
 #[wasm_bindgen]
-pub fn sign_message(private_key: String, public_key: String, message: String) -> js_sys::Object {
+pub fn sign_message(
+    private_key: String,
+    public_key: String,
+    message: String,
+    datetime: String,
+) -> js_sys::Object {
     console_error_panic_hook::set_once();
 
     let private_key_decoded = base64::decode(&private_key).unwrap();
@@ -32,14 +39,24 @@ pub fn sign_message(private_key: String, public_key: String, message: String) ->
     let mut keypair_bytes = Vec::new();
     keypair_bytes.extend(private_key_decoded.iter().cloned());
     keypair_bytes.extend(public_key_decoded.iter().cloned());
-
     let keypair: Keypair = Keypair::from_bytes(&keypair_bytes[..]).unwrap();
-    let signed = keypair.sign(message.as_bytes());
 
-    let signature = base64::encode_config(&signed.to_bytes()[..], base64::URL_SAFE);
+    assert_eq!(datetime.len(), DATETIME_LEN);
+
+    let mut signable: Vec<u8> = Vec::new();
+    signable.extend(datetime.as_bytes());
+    signable.extend(message.as_bytes());
+
+    let signed = keypair.sign(&signable[..]);
+
+    let mut signature: Vec<u8> = Vec::new();
+    signature.extend(datetime.as_bytes());
+    signature.extend(&signed.to_bytes()[..]);
+
+    let signature_encoded = base64::encode_config(&signature, base64::URL_SAFE);
 
     let js_object = js_sys::Object::new();
-    js_sys::Reflect::set(&js_object, &"signature".into(), &signature.into()).unwrap();
+    js_sys::Reflect::set(&js_object, &"signature".into(), &signature_encoded.into()).unwrap();
     js_object
 }
 
@@ -54,8 +71,21 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         Err(_) => {
             js_sys::Reflect::set(
                 &js_verified,
-                &"verified".into(),
+                &"error".into(),
                 &"Unable to base64 decode Public Key".into(),
+            )
+            .unwrap();
+            return js_verified;
+        }
+    };
+
+    let public_key = match PublicKey::from_bytes(&public_key_decoded[..]) {
+        Ok(v) => v,
+        Err(_) => {
+            js_sys::Reflect::set(
+                &js_verified,
+                &"error".into(),
+                &"Unable to parse Public Key".into(),
             )
             .unwrap();
             return js_verified;
@@ -68,7 +98,7 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         Err(e) => {
             js_sys::Reflect::set(
                 &js_verified,
-                &"verified".into(),
+                &"error".into(),
                 &format!("Unable to parse Signature: {} {}", e, signature).into(),
             )
             .unwrap();
@@ -76,44 +106,48 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         }
     }
 
-    let public_key = match PublicKey::from_bytes(&public_key_decoded[..]) {
+    let datetime_bytes = &signature_decoded[..DATETIME_LEN];
+    let signature_bytes = &signature_decoded[DATETIME_LEN..];
+
+    let signature = match Signature::from_bytes(signature_bytes) {
         Ok(v) => v,
-        Err(_) => {
+        Err(e) => {
             js_sys::Reflect::set(
                 &js_verified,
-                &"verified".into(),
-                &"Unable to parse Public Key".into(),
+                &"error".into(),
+                &format!("Error parsing signature: {}", e).into(),
             )
             .unwrap();
             return js_verified;
         }
     };
 
-    let signature = match Signature::from_bytes(&signature_decoded[..]) {
-        Ok(v) => v,
-        Err(_) => {
-            js_sys::Reflect::set(
-                &js_verified,
-                &"verified".into(),
-                &"Unable to parse Signature".into(),
-            )
-            .unwrap();
-            return js_verified;
-        }
-    };
+    let mut verifiable: Vec<u8> = Vec::new();
+    verifiable.extend(datetime_bytes);
+    verifiable.extend(message.as_bytes());
 
-    let verified = public_key.verify(message.as_bytes(), &signature);
+    let verified = public_key.verify(&verifiable[..], &signature);
 
     match verified {
         Ok(_) => {
-            js_sys::Reflect::set(&js_verified, &"verified".into(), &"Verified!".into()).unwrap()
+            js_sys::Reflect::set(
+                &js_verified,
+                &"datetime".into(),
+                &String::from_utf8(datetime_bytes.to_vec()).unwrap().into(),
+            ).unwrap();
+            js_sys::Reflect::set(&js_verified, &"verified".into(), &JsValue::from_bool(true))
+                .unwrap()
         }
-        Err(_) => js_sys::Reflect::set(
-            &js_verified,
-            &"verified".into(),
-            &"Verification Failed!".into(),
-        )
-        .unwrap(),
+        Err(e) => {
+            js_sys::Reflect::set(
+                &js_verified,
+                &"error".into(),
+                &format!("Error validating signature: {}", e).into(),
+            )
+            .unwrap();
+            js_sys::Reflect::set(&js_verified, &"verified".into(), &JsValue::from_bool(false))
+                .unwrap()
+        }
     };
     js_verified
 }
