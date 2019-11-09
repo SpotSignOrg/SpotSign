@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+    "name": "SpotSign",
+    "version": "1.0.0",
+    "description": "Digital Signatures for the Web.",
+    "icons": {
+        "32": "icons/pen.png"
+    },
+    "permissions": [
+        "activeTab"
+    ],
+    "browser_action": {
+        "default_icon": "icons/pen.png",
+        "default_title": "SpotSign",
+        "default_popup": "popup/popup.html",
+        "browser_style": true
+    },
+    "background": {
+        "scripts": ["background_scripts/index.js"]
+    }
+}

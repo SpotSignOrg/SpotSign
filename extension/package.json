@@ -1,0 +1,15 @@
+{
+  "name": "spot-sign",
+  "version": "1.0.0",
+  "description": "Digital Signatures for the Web.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "webpack": "^2.3.2"
+  },
+  "dependencies": {
+  }
+}
