@@ -1,0 +1,29 @@
+{
+
+  "description": "Digitally sign web content",
+  "manifest_version": 2,
+  "name": "SpotSign",
+  "version": "1.0",
+  "homepage_url": "https://github.com/spotsignorg/spotsign",
+  "icons": {
+    "48": "icons/pen.png"
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/pen.png",
+    "theme_icons": [{
+        "light": "icons/pen.png",
+        "dark": "icons/pen.png",
+        "size": 32
+    }],
+    "default_title": "SpotSign",
+    "default_popup": "popup/popup.html"
+  },
+
+  "web_accessible_resources": [
+  ]
+}
