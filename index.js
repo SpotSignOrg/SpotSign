@@ -22,16 +22,16 @@ rust
       const signature = m.sign_message(private_key, public_key, message, datetime);
 
       console.log(signature);
-      document.getElementById("signature").value = signature.signature;
-      //document.getElementById("signature").value = toUtf32(signature.signature);
+      // document.getElementById("signature").value = signature.signature;
+      document.getElementById("signature").value = toUtf32(signature.signature);
 
     })
     document.getElementById("verify").addEventListener("click", e => {
       const author = document.getElementById("author").value;
       const message = document.getElementById("message").value;
       const public_key = document.getElementById("publickey").value;
-      const signature = document.getElementById("signature").value;
-      // const signature = fromUtf32(document.getElementById("signature").value);
+      // const signature = document.getElementById("signature").value;
+      const signature = fromUtf32(document.getElementById("signature").value);
 
       const verification = m.verify_message(public_key, signature, message);
       if (verification.error) {
