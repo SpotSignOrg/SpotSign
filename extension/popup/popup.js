@@ -7,17 +7,18 @@ const MSG_SEND_CONTENT = "sendContent";
  */
 function listenForClicks() {
   document.addEventListener("click", (e) => {
-    console.log("clicked");
+    console.log("popup button clicked");
     /**
      * Insert the page-hiding CSS into the active tab,
      * then get the beast URL and
      * send a "beastify" message to the content script in the active tab.
      */
     function sendGetContent(tabs) {
-      console.log("sending message");
-      browser.tabs.sendMessage(tabs[0].id, {
+      const message = {
         command: MSG_GET_CONTENT,
-      });
+      };
+      console.log("sending message from popup", message);
+      browser.tabs.sendMessage(tabs[0].id, message);
     }
 
     /**
@@ -52,7 +53,3 @@ function reportExecuteScriptError(error) {
 browser.tabs.executeScript({file: "/content_scripts/content.js"})
   .then(listenForClicks)
   .catch(reportExecuteScriptError);
-
-browser.runtime.onMessage.addListener((message) => {
-  console.log("received message in popup:", message);
-});

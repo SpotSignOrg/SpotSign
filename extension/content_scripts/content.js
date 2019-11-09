@@ -17,14 +17,15 @@
   }
 
   browser.runtime.onMessage.addListener((message) => {
-    console.log("received message", message);
+    console.log("received message in content", message);
     if (message.command === MSG_GET_CONTENT) {
       const content = getActiveContent();
-      console.log("sending content", content);
-      browser.runtime.sendMessage({
+      const response = {
         command: MSG_SEND_CONTENT,
         content
-      })
+      };
+      console.log("sending message in content", response);
+      browser.runtime.sendMessage(response);
     };
   });
 })();
