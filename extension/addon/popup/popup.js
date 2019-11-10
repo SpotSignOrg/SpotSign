@@ -1,7 +1,7 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import messages from '../lib/messages';
+import messages from 'addon/lib/messages';
 
 /**
  * Listen for clicks on the buttons, and send the appropriate message to

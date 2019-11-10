@@ -13,6 +13,12 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "[name]/index.js"
   },
+  resolve: {
+    alias: {
+      addon: path.resolve(__dirname, 'addon/'),
+      signer: path.resolve(__dirname, '../signer/')
+    }
+  },
   plugins: [
     new WasmPackPlugin({
       crateDirectory: path.resolve(__dirname, "../signer")

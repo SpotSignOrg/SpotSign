@@ -1,4 +1,4 @@
-import messages from '../lib/messages';
+import messages from 'addon/lib/messages';
 
 (function() {
   /**

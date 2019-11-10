@@ -1,4 +1,4 @@
-const rust = import('../../../signer/pkg');
+const rust = import('signer/pkg');
 
 
 const MSG_GET_CONTENT = "getContent";
