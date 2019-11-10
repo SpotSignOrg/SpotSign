@@ -1,22 +1,28 @@
-const rust = import('signer/pkg');
+const signerPkg = import('signer/pkg');
+const messages = import('addon/lib/messages');
 
-
-const MSG_GET_CONTENT = "getContent";
-const MSG_SEND_CONTENT = "sendContent";
-
-
-rust
+signerPkg
   .then(signer => {
-    browser.runtime.onMessage.addListener((message) => {
-      console.log("received message in background:", message);
+    messages.then(({GET_KEYS, SEND_KEYS}) => {
+      browser.runtime.onMessage.addListener(message => {
+        console.log("received message in background:", message);
 
-      const keys = signer.get_keys();
-      console.log("Generated keys", keys);
+        switch (message.message) {
+          case GET_KEYS:
+            const keys = signer.get_keys();
+            console.log("Generated keys", keys);
+            browser.runtime.sendMessage({
+              message: SEND_KEYS,
+              keys
+            })
+            break;
 
-      const datetime = new Date().toISOString();
-
-      const signature = signer.sign_message(keys.private_key, keys.public_key, message.content, datetime);
-
-      console.log("Signed:", signature);
-    });
+          // case SIGN_CONTENT:
+          //   const datetime = new Date().toISOString();
+          //   const signature = signer.sign_message(keys.private_key, keys.public_key, message.content, datetime);
+          //   console.log("Signed:", signature);
+          //   break;
+        }
+      });
+    })
   });

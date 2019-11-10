@@ -1,4 +1,4 @@
-import messages from 'addon/lib/messages';
+import { GET_CONTENT, SEND_CONTENT } from 'addon/lib/messages';
 
 (function() {
   /**
@@ -21,10 +21,10 @@ import messages from 'addon/lib/messages';
 
   browser.runtime.onMessage.addListener((message) => {
     console.log("received message in content", message);
-    if (message.message === messages.MSG_GET_CONTENT) {
+    if (message.message === GET_CONTENT) {
       const content = getActiveContent();
       const response = {
-        message: messages.MSG_SEND_CONTENT,
+        message: SEND_CONTENT,
         content
       };
       console.log("sending message in content", response);
