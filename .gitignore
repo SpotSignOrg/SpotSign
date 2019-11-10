@@ -15,3 +15,5 @@ pkg/
 dist/
 node_modules/
 *.code-workspace
+*.map
+index.js # TODO: find a better way to exclude these built js assets
