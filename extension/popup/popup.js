@@ -1,5 +1,7 @@
-const MSG_GET_CONTENT = "getContent";
-const MSG_SEND_CONTENT = "sendContent";
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import messages from '../lib/messages';
 
 /**
  * Listen for clicks on the buttons, and send the appropriate message to
@@ -15,7 +17,7 @@ function listenForClicks() {
      */
     function sendGetContent(tabs) {
       const message = {
-        command: MSG_GET_CONTENT,
+        message: messages.MSG_GET_CONTENT,
       };
       console.log("sending message from popup", message);
       browser.tabs.sendMessage(tabs[0].id, message);

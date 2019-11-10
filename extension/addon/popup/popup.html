@@ -1,19 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 
-<html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="popup.css"/>
+    <title>SpotSign</title>
   </head>
 
-<body>
-  <div id="popup-content">
-    <div class="button">Sign</div>
-  </div>
-  <div id="error-content" class="hidden">
-    <p>Can't sign this web page.</p><p>Try a different page.</p>
-  </div>
-  <script src="index.js"></script>
-</body>
+  <body>
+    <div class="container">
+      <div class="row my-4">
+        <div class="col">
+          <h3>SpotSign</h3>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="message">Private Key</label>
+            <input id="privatekey" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="message">Public Key</label>
+            <input id="publickey" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <button id="generate" class="btn btn-primary">Generate Keys</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="author">Author</label>
+            <input id="author" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="message">Message</label>
+            <input class="form-control" id="message">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="signature">Signature</label>
+            <input id="signature" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <button id="sign" class="btn btn-primary">Sign</button>
+            <button id="verify" class="btn btn-primary">Verify</button>
+            <span id="verification"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="index.js"></script>
+  </body>
 
 </html>

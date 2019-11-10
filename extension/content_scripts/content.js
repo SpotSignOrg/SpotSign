@@ -1,3 +1,5 @@
+import messages from '../lib/messages';
+
 (function() {
   /**
    * Check and set a global guard variable.
@@ -9,9 +11,6 @@
   }
   window.hasRun = true;
 
-  const MSG_GET_CONTENT = "getContent";
-  const MSG_SEND_CONTENT = "sendContent";
-
   function getActiveContent() {
     const element = document.activeElement;
     console.log("Active element:", element);
@@ -22,10 +21,10 @@
 
   browser.runtime.onMessage.addListener((message) => {
     console.log("received message in content", message);
-    if (message.command === MSG_GET_CONTENT) {
+    if (message.message === messages.MSG_GET_CONTENT) {
       const content = getActiveContent();
       const response = {
-        command: MSG_SEND_CONTENT,
+        message: messages.MSG_SEND_CONTENT,
         content
       };
       console.log("sending message in content", response);

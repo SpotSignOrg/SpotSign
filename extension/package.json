@@ -11,9 +11,14 @@
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "0.4.2",
     "webpack": "^4.29.4",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "webpack-dev-server": "^3.9.0"
+    "bootstrap": "^4.3.1",
+    "css-loader": "^3.2.0",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.0",
+    "style-loader": "^1.0.0"
   }
 }
