@@ -4,12 +4,16 @@
   "description": "Digital Signatures for the Web.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "serve": "webpack-dev-server"
   },
   "license": "MPL-2.0",
   "devDependencies": {
+    "@wasm-tool/wasm-pack-plugin": "0.4.2",
     "webpack": "^4.29.4",
     "webpack-cli": "^3.3.10"
   },
-  "dependencies": {}
+  "dependencies": {
+    "webpack-dev-server": "^3.9.0"
+  }
 }

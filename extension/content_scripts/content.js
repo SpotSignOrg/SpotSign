@@ -13,7 +13,11 @@
   const MSG_SEND_CONTENT = "sendContent";
 
   function getActiveContent() {
-    return document.activeElement.value;
+    const element = document.activeElement;
+    console.log("Active element:", element);
+    const content = document.activeElement.value || document.activeElement.innerText;
+    console.log("Found content:", content);
+    return content;
   }
 
   browser.runtime.onMessage.addListener((message) => {
