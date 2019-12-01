@@ -1,4 +1,4 @@
-import { GET_CONTENT, SEND_CONTENT } from 'addon/lib/messages';
+import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from 'addon/lib/messages';
 
 (function() {
   /**
@@ -6,10 +6,17 @@ import { GET_CONTENT, SEND_CONTENT } from 'addon/lib/messages';
    * If this content script is injected into the same page again,
    * it will do nothing next time.
    */
+  console.log("Entering content script");
   if (window.hasRun) {
     return;
   }
   window.hasRun = true;
+
+  const message = {
+    message: "content alive!",
+  };
+  console.log("sending message from content", message);
+  browser.runtime.sendMessage(message);
 
   function getActiveContent() {
     const element = document.activeElement;
@@ -19,16 +26,17 @@ import { GET_CONTENT, SEND_CONTENT } from 'addon/lib/messages';
     return content;
   }
 
-  browser.runtime.onMessage.addListener((message) => {
+  console.log("content listening");
+  browser.runtime.onMessage.addListener(message => {
     console.log("received message in content", message);
-    if (message.message === GET_CONTENT) {
+    if (message.message === POPUP_GET_CONTENT) {
       const content = getActiveContent();
-      const response = {
-        message: SEND_CONTENT,
+      const message = {
+        message: CONTENT_SEND_CONTENT,
         content
       };
-      console.log("sending message in content", response);
-      browser.runtime.sendMessage(response);
+      console.log("sending message in content", message);
+      browser.runtime.sendMessage(message);
     };
   });
 })();

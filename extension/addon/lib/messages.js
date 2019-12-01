@@ -1,4 +1,6 @@
-export const GET_CONTENT = "getContent";
-export const SEND_CONTENT = "sendContent";
+export const POPUP_GET_CONTENT = "popupGetContent";
+export const BACKGROUND_GET_CONTENT = "backgroundGetContent";
+export const CONTENT_SEND_CONTENT = "contentSendContent";
+export const BACKGROUND_SEND_CONTENT = "backgroundSendContent";
 export const GET_KEYS = "getKeys";
 export const SEND_KEYS = "sendKeys";
