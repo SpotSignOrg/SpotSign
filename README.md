@@ -1,2 +1,2 @@
 # SpotSign
-SpotSign Digital Signature
+Digital Signatures for the Open Web
