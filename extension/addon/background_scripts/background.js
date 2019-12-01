@@ -3,7 +3,7 @@ const messages = import('addon/lib/messages');
 
 signerPkg
   .then(signer => {
-    messages.then(({ GET_KEYS, SEND_KEYS, POPUP_GET_CONTENT, BACKGROUND_GET_CONTENT, CONTENT_SEND_CONTENT, BACKGROUND_SEND_CONTENT }) => {
+    messages.then(({ GET_KEYS, SEND_KEYS, SIGN_CONTENT, CONTENT_SIGNED }) => {
       browser.runtime.onMessage.addListener(message => {
         console.log("received message in background:", message);
 
@@ -16,18 +16,16 @@ signerPkg
               keys
             });
             break;
-          case POPUP_GET_CONTENT:
-            const message = {
-              message: BACKGROUND_GET_CONTENT,
-            };
-            console.log("background sending message", message);
-            browser.runtime.sendMessage(message);
+          case SIGN_CONTENT:
+            const { content, privateKey, publicKey } = message;
+            const datetime = new Date().toISOString();
+            const signature = signer.sign_message(privateKey, publicKey, content, datetime).signature;
+            console.log("Signed:", signature);
+            browser.runtime.sendMessage({
+              message: CONTENT_SIGNED,
+              signature
+            });
             break;
-          // case SIGN_CONTENT:
-          //   const datetime = new Date().toISOString();
-          //   const signature = signer.sign_message(keys.private_key, keys.public_key, message.content, datetime);
-          //   console.log("Signed:", signature);
-          //   break;
         }
       });
     })
