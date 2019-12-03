@@ -111,12 +111,12 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
         Ok(_) => {
             let datetime = String::from_utf8(datetime_bytes.to_vec()).unwrap();
             let verified = JsValue::from_bool(true);
-            return jsobj! {"datetime": datetime, "verified": verified};
+            jsobj! {"datetime": datetime, "verified": verified}
         }
         Err(e) => {
             let error = format!("Error validating signature: {}", e);
             let verified = JsValue::from_bool(false);
-            return jsobj! {"verified": verified, "error": error};
+            jsobj! {"verified": verified, "error": error}
         }
-    };
+    }
 }
