@@ -9,7 +9,7 @@ use wasm_bindgen::prelude::*;
 const DATETIME_LEN: usize = 24;
 
 macro_rules! jsobj {
-    { $( $key:tt : $value:tt ),* } => {{
+    { $( $key:tt : $value:expr ),* } => {{
         let js_object = js_sys::Object::new();
         $(
             js_sys::Reflect::set(&js_object, &$key.into(), &$value.into()).unwrap();
@@ -25,10 +25,10 @@ pub fn get_keys() -> js_sys::Object {
     let mut csprng: OsRng = OsRng::new().unwrap();
     let keypair: Keypair = Keypair::generate(&mut csprng);
 
-    let private_key = base64::encode(&keypair.secret.to_bytes());
-    let public_key = base64::encode(&keypair.public.to_bytes());
-
-    jsobj! {"private_key": private_key, "public_key": public_key}
+    jsobj! {
+        "private_key": base64::encode(&keypair.secret.to_bytes()),
+        "public_key": base64::encode(&keypair.public.to_bytes())
+    }
 }
 
 #[wasm_bindgen]
@@ -60,9 +60,7 @@ pub fn sign_message(
     signature.extend(datetime.as_bytes());
     signature.extend(&signed.to_bytes()[..]);
 
-    let signature_encoded = base64::encode_config(&signature, base64::URL_SAFE);
-
-    jsobj! { "signature": signature_encoded }
+    jsobj! { "signature": base64::encode_config(&signature, base64::URL_SAFE) }
 }
 
 #[wasm_bindgen]
@@ -87,8 +85,7 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     match base64::decode_config_buf(&signature, base64::URL_SAFE, &mut signature_decoded) {
         Ok(_) => (),
         Err(e) => {
-            let error = format!("Unable to parse Signature: {} {}", e, signature);
-            return jsobj! { "error": error };
+            return jsobj! { "error": format!("Unable to parse Signature: {} {}", e, signature) };
         }
     }
 
@@ -98,8 +95,7 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
     let signature = match Signature::from_bytes(signature_bytes) {
         Ok(v) => v,
         Err(e) => {
-            let error = format!("Error parsing signature: {}", e);
-            return jsobj! { "error": error };
+            return jsobj! { "error": format!("Error parsing signature: {}", e) };
         }
     };
 
@@ -109,14 +105,16 @@ pub fn verify_message(public_key: String, signature: String, message: String) ->
 
     match public_key.verify(&verifiable[..], &signature) {
         Ok(_) => {
-            let datetime = String::from_utf8(datetime_bytes.to_vec()).unwrap();
-            let verified = JsValue::from_bool(true);
-            jsobj! {"datetime": datetime, "verified": verified}
+            jsobj! {
+                "datetime": String::from_utf8(datetime_bytes.to_vec()).unwrap(),
+                "verified": JsValue::from_bool(true)
+            }
         }
         Err(e) => {
-            let error = format!("Error validating signature: {}", e);
-            let verified = JsValue::from_bool(false);
-            jsobj! {"verified": verified, "error": error}
+            jsobj! {
+                "verified": JsValue::from_bool(false),
+                "error": format!("Error validating signature: {}", e)
+            }
         }
     }
 }
