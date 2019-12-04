@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
         "module": "esnext",
-        "target": "es5",
+        "target": "es6",
         "sourceMap": true,
-        "jsx": "react",
-        "allowJs": true,
-        "outDir": "./ts/",
+        "baseUrl": ".",
+        "moduleResolution": "node",
+        "paths": {
+            "addon/*": ["addon/*"],
+            "signer/*": ["../signer/*"],
+        }
     },
     "include": [
         "addon/**/*"
