@@ -1,5 +1,12 @@
 import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from 'addon/lib/messages';
 
+declare global {
+  interface Window {
+    hasRun:any;
+  }
+  const browser:any;
+}
+
 (function() {
   /**
    * Check and set a global guard variable.
@@ -21,7 +28,7 @@ import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from 'addon/lib/messages';
   function getActiveContent() {
     const element = document.activeElement;
     console.log("Active element:", element);
-    const content = document.activeElement.value || document.activeElement.innerText;
+    const content = (<HTMLInputElement>document.activeElement).value || (<HTMLElement>document.activeElement).innerText;
     console.log("Found content:", content);
     return content;
   }

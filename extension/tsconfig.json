@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "es5",
+        "sourceMap": true,
+        "jsx": "react",
+        "allowJs": true,
+        "outDir": "./ts/",
+    },
+    "include": [
+        "addon/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+   }

@@ -34,9 +34,9 @@ document.getElementById("fetch-content").addEventListener("click", e => {
 });
 
 document.getElementById("sign").addEventListener("click", e => {
-  const content = document.getElementById("message").value;
-  const privateKey = document.getElementById("privatekey").value;
-  const publicKey = document.getElementById("publickey").value;
+  const content = (<HTMLInputElement>document.getElementById("message")).value;
+  const privateKey = (<HTMLInputElement>document.getElementById("privatekey")).value;
+  const publicKey = (<HTMLInputElement>document.getElementById("publickey")).value;
   const message = {
     message: SIGN_CONTENT,
     content,
@@ -53,16 +53,16 @@ browser.runtime.onMessage.addListener(message => {
   switch (message.message) {
     case SEND_KEYS:
       console.log("received keys in popup", message.keys);
-      document.getElementById("privatekey").value = message.keys.private_key;
-      document.getElementById("publickey").value = message.keys.public_key;
+      (<HTMLInputElement>document.getElementById("privatekey")).value = message.keys.private_key;
+      (<HTMLInputElement>document.getElementById("publickey")).value = message.keys.public_key;
       break;
     case CONTENT_SEND_CONTENT:
       console.log("received content in popup", message.content);
-      document.getElementById("message").value = message.content;
+      (<HTMLInputElement>document.getElementById("message")).value = message.content;
       break;
     case CONTENT_SIGNED:
       console.log("received signature in popup", message.signature);
-      document.getElementById("signature").value = message.signature;
+      (<HTMLInputElement>document.getElementById("signature")).value = message.signature;
       break;
   }
 });

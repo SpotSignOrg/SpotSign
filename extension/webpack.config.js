@@ -5,15 +5,16 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    background_scripts: "./addon/background_scripts/background.js",
-    content_scripts: "./addon/content_scripts/content.js",
-    popup: "./addon/popup/popup.js"
+    background_scripts: "./addon/background_scripts/background.ts",
+    content_scripts: "./addon/content_scripts/content.ts",
+    popup: "./addon/popup/popup.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name]/index.js"
   },
   resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ],
     alias: {
       addon: path.resolve(__dirname, 'addon/'),
       signer: path.resolve(__dirname, '../signer/')
@@ -32,6 +33,11 @@ module.exports = {
   ],
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
