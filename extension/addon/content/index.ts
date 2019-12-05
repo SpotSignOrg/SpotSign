@@ -31,7 +31,6 @@ declare global {
 
   console.log("content listening");
   listen((message: MessageToContent) => {
-    console.log("received message in content", message);
     switch (message.type) {
       case MessageType.GET_CONTENT:
         const content = getActiveContent();

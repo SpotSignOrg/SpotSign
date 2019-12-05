@@ -32,24 +32,18 @@ if (sign) {
 }
 
 listen((message: MessageToPopup) => {
-  console.log("received message in popup", message);
-
   switch (message.type) {
     case MessageType.SEND_KEYS:
-      console.log("received keys in popup", message.keys);
       (document.getElementById("privatekey") as HTMLInputElement).value = message.keys.private_key;
       (document.getElementById("publickey") as HTMLInputElement).value = message.keys.public_key;
       break;
     case MessageType.SEND_CONTENT:
-      console.log("received content in popup", message.content);
       (document.getElementById("message") as HTMLInputElement).value = message.content;
       break;
     case MessageType.CONTENT_SIGNED:
-      console.log("received signature in popup", message.signature);
       (document.getElementById("signature") as HTMLInputElement).value = message.signature;
       break;
     case MessageType.CONTENT_ALIVE:
-      console.log("received content alive in popup!");
       break;
     default:
       assertNever(message);

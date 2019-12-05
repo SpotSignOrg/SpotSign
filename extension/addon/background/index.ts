@@ -6,12 +6,9 @@ import { Keys, Signature } from "addon/signer";
 
 signerPkg.then(signer => {
   listen((message: MessageToBackground) => {
-    console.log("received message in background:", message);
-
     switch (message.type) {
       case MessageType.GET_KEYS:
         const keys = signer.get_keys() as Keys;
-        console.log("background sending keys", keys);
         sendToPopup({
           type: MessageType.SEND_KEYS,
           keys,
@@ -21,7 +18,6 @@ signerPkg.then(signer => {
         const { content, privateKey, publicKey } = message;
         const datetime = new Date().toISOString();
         const signature = (signer.sign_message(privateKey, publicKey, content, datetime) as Signature).signature;
-        console.log("Signed:", signature);
         sendToPopup({
           type: MessageType.CONTENT_SIGNED,
           signature,

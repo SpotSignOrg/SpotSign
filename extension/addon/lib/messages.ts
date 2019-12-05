@@ -78,5 +78,8 @@ export function sendToPopup(message: MessageToPopup): void {
 }
 
 export function listen(listener: (_: Message) => void): void {
-  browser.runtime.onMessage.addListener(listener);
+  browser.runtime.onMessage.addListener((message: Message) => {
+    console.log("received message:", message);
+    listener(message);
+  });
 }
