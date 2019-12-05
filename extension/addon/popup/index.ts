@@ -2,17 +2,26 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { assertNever } from "addon/lib/never";
-import { MessageType, MessageToPopup, sendToContent, sendToBackground, listen } from "addon/lib/messages";
+import {
+  MessageTarget,
+  MessageType,
+  MessageToPopup,
+  sendToContent,
+  sendToBackground,
+  listen,
+} from "addon/lib/messages";
 
 (document.getElementById("generate") as HTMLElement).addEventListener("click", () => {
   sendToBackground({
     type: MessageType.GET_KEYS,
+    sender: MessageTarget.POPUP,
   });
 });
 
 (document.getElementById("fetch-content") as HTMLElement).addEventListener("click", () => {
   sendToContent({
     type: MessageType.GET_CONTENT,
+    sender: MessageTarget.POPUP,
   });
 });
 
@@ -24,6 +33,7 @@ if (sign) {
     const publicKey = (document.getElementById("publickey") as HTMLInputElement).value;
     sendToBackground({
       type: MessageType.SIGN_CONTENT,
+      sender: MessageTarget.POPUP,
       content,
       privateKey,
       publicKey,
@@ -31,7 +41,7 @@ if (sign) {
   });
 }
 
-listen((message: MessageToPopup) => {
+listen(MessageTarget.POPUP, (message: MessageToPopup) => {
   switch (message.type) {
     case MessageType.SEND_KEYS:
       (document.getElementById("privatekey") as HTMLInputElement).value = message.keys.private_key;

@@ -1,5 +1,11 @@
 import { Keys } from "addon/signer";
 
+export enum MessageTarget {
+  BACKGROUND = "background",
+  POPUP = "popup",
+  CONTENT = "content",
+}
+
 export enum MessageType {
   GET_CONTENT = "getContent",
   SEND_CONTENT = "sendContent",
@@ -10,11 +16,15 @@ export enum MessageType {
   CONTENT_ALIVE = "contentAlive",
 }
 
-export interface MessageGetKeys {
+interface MessageWithSender {
+  sender: MessageTarget;
+}
+
+export interface MessageGetKeys extends MessageWithSender {
   type: MessageType.GET_KEYS;
 }
 
-export interface MessageSignContent {
+export interface MessageSignContent extends MessageWithSender {
   type: MessageType.SIGN_CONTENT;
   publicKey: string;
   privateKey: string;
@@ -23,28 +33,28 @@ export interface MessageSignContent {
 
 export type MessageToBackground = MessageGetKeys | MessageSignContent;
 
-export interface MessageSendKeys {
+export interface MessageSendKeys extends MessageWithSender {
   type: MessageType.SEND_KEYS;
   keys: Keys;
 }
 
-export interface MessageContentSigned {
+export interface MessageContentSigned extends MessageWithSender {
   type: MessageType.CONTENT_SIGNED;
   signature: string;
 }
 
-export interface MessageContentAlive {
+export interface MessageContentAlive extends MessageWithSender {
   type: MessageType.CONTENT_ALIVE;
 }
 
-export interface MessageSendContent {
+export interface MessageSendContent extends MessageWithSender {
   type: MessageType.SEND_CONTENT;
   content: string;
 }
 
 export type MessageToPopup = MessageSendKeys | MessageContentSigned | MessageContentAlive | MessageSendContent;
 
-export interface MessageGetContent {
+export interface MessageGetContent extends MessageWithSender {
   type: MessageType.GET_CONTENT;
 }
 
@@ -77,9 +87,9 @@ export function sendToPopup(message: MessageToPopup): void {
   browser.runtime.sendMessage(message);
 }
 
-export function listen(listener: (_: Message) => void): void {
+export function listen(receiver: MessageTarget, listener: (_: Message) => void): void {
   browser.runtime.onMessage.addListener((message: Message) => {
-    console.log("received message:", message);
+    console.log(`Received message in ${receiver}:`, message);
     listener(message);
   });
 }
