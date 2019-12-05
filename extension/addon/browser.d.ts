@@ -1,9 +1,5 @@
 import { Message, MessageToContent, MessageToBackground, MessageToPopup } from "addon/lib/messages";
 
-export interface Window {
-  hasRun: boolean;
-}
-
 export interface BrowserOnMessage {
   addListener(handler: (message: Message) => void): void;
 }
@@ -34,4 +30,8 @@ export interface Browser {
 
 declare global {
   const browser: Browser;
+
+  interface Window {
+    hasRun: boolean;
+  }
 }

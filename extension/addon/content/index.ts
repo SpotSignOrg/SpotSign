@@ -1,11 +1,5 @@
 import { MessageType, MessageToContent, sendToPopup } from "addon/lib/messages";
 
-declare global {
-  interface Window {
-    hasRun: boolean;
-  }
-}
-
 (function(): void {
   /**
    * Check and set a global guard variable.
