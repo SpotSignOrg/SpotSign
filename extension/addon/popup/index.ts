@@ -2,7 +2,7 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { assertNever } from "addon/lib/never";
-import { MessageType, MessageToPopup, sendToContent, sendToBackground } from "addon/lib/messages";
+import { MessageType, MessageToPopup, sendToContent, sendToBackground, listen } from "addon/lib/messages";
 
 (document.getElementById("generate") as HTMLElement).addEventListener("click", () => {
   sendToBackground({
@@ -31,7 +31,7 @@ if (sign) {
   });
 }
 
-browser.runtime.onMessage.addListener((message: MessageToPopup) => {
+listen((message: MessageToPopup) => {
   console.log("received message in popup", message);
 
   switch (message.type) {

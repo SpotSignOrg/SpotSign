@@ -1,4 +1,4 @@
-import { MessageType, MessageToContent, sendToPopup } from "addon/lib/messages";
+import { MessageType, MessageToContent, sendToPopup, listen } from "addon/lib/messages";
 
 declare global {
   interface Window {
@@ -30,7 +30,7 @@ declare global {
   }
 
   console.log("content listening");
-  browser.runtime.onMessage.addListener((message: MessageToContent) => {
+  listen((message: MessageToContent) => {
     console.log("received message in content", message);
     switch (message.type) {
       case MessageType.GET_CONTENT:

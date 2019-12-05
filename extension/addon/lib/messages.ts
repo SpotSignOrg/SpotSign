@@ -76,3 +76,7 @@ export function sendToPopup(message: MessageToPopup): void {
   console.log("Sending message to popup", message);
   browser.runtime.sendMessage(message);
 }
+
+export function listen(listener: (_: Message) => void): void {
+  browser.runtime.onMessage.addListener(listener);
+}

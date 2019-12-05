@@ -1,11 +1,11 @@
 const signerPkg = import("signer/pkg");
 
 import { assertNever } from "addon/lib/never";
-import { MessageType, MessageToBackground, sendToPopup } from "addon/lib/messages";
+import { MessageType, MessageToBackground, sendToPopup, listen } from "addon/lib/messages";
 import { Keys, Signature } from "addon/signer";
 
 signerPkg.then(signer => {
-  browser.runtime.onMessage.addListener((message: MessageToBackground) => {
+  listen((message: MessageToBackground) => {
     console.log("received message in background:", message);
 
     switch (message.type) {
