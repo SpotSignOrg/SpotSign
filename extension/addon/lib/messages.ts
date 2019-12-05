@@ -14,7 +14,7 @@ export interface MessageGetKeys {
   type: MessageType.GET_KEYS;
 }
 
-export class MessageSignContent {
+export interface MessageSignContent {
   type: MessageType.SIGN_CONTENT;
   publicKey: string;
   privateKey: string;
