@@ -5,6 +5,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "paths": {
       "addon/*": [
         "addon/*"

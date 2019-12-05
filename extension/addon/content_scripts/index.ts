@@ -1,4 +1,10 @@
-import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from "addon/lib/messages";
+import { MessageToPopup, MessageType, MessageToContent } from "addon/lib/messages";
+
+declare global {
+  interface Window {
+    hasRun: boolean;
+  }
+}
 
 (function(): void {
   /**
@@ -12,11 +18,12 @@ import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from "addon/lib/messages";
   }
   window.hasRun = true;
 
-  const message = {
-    message: "content alive!",
-  };
-  console.log("sending message from content", message);
-  browser.runtime.sendMessage(message);
+  function sendMessage(message: MessageToPopup): void {
+    console.log("sending message from content");
+    browser.runtime.sendMessage(message);
+  }
+
+  sendMessage({ type: MessageType.CONTENT_ALIVE });
 
   function getActiveContent(): string {
     const element = document.activeElement;
@@ -28,16 +35,15 @@ import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from "addon/lib/messages";
   }
 
   console.log("content listening");
-  browser.runtime.onMessage.addListener(message => {
+  browser.runtime.onMessage.addListener((message: MessageToContent) => {
     console.log("received message in content", message);
-    if (message.message === POPUP_GET_CONTENT) {
-      const content = getActiveContent();
-      const message = {
-        message: CONTENT_SEND_CONTENT,
-        content,
-      };
-      console.log("sending message in content", message);
-      browser.runtime.sendMessage(message);
+    switch (message.type) {
+      case MessageType.GET_CONTENT:
+        const content = getActiveContent();
+        sendMessage({
+          type: MessageType.SEND_CONTENT,
+          content,
+        });
     }
   });
 })();

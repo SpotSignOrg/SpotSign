@@ -1,5 +1,5 @@
 // From https://stackoverflow.com/questions/47022193/make-a-utf-8-string-shorter-with-a-utf-32-encoding-in-javascript
-export function toUtf32(input): string {
+export function toUtf32(input: string): string {
   input = unescape(encodeURIComponent(input));
   let newString = "",
     char,
@@ -34,7 +34,7 @@ export function toUtf32(input): string {
   return newString;
 }
 
-export function fromUtf32(input): string {
+export function fromUtf32(input: string): string {
   let newString = "",
     char,
     codeStr,

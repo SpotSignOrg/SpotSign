@@ -11,4 +11,7 @@ module.exports = {
     project: "./tsconfig.json"
   },
   ignorePatterns: ["webpack.config.js", "node_modules/", "icons/", "manifest.json", "*.html"],
+  rules: {
+    "eslint(@typescript-eslint/camelcase)": "off"
+  }
 };  

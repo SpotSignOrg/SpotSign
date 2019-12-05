@@ -1,24 +1,39 @@
-interface Window {
+import { Message, MessageToContent, MessageToBackground, MessageToPopup } from "addon/lib/messages";
+
+export interface Window {
   hasRun: boolean;
 }
 
-interface BrowserOnMessage {
-  addListener(handler): void;
+export interface BrowserOnMessage {
+  addListener(handler: (message: Message) => void): void;
 }
 
-interface BrowserTabs {
-  query;
-  sendMessage;
+export interface Tab {
+  id: number;
 }
 
-interface Runtime {
-  sendMessage(message): void;
+export type Tabs = Array<Tab>;
+
+export interface TabQuery {
+  currentWindow: boolean;
+  active: boolean;
+}
+
+export interface BrowserTabs {
+  query: (_: TabQuery) => Promise<Tabs>;
+  sendMessage: (tabId: number, message: MessageToContent) => void;
+}
+
+export interface Runtime {
+  sendMessage(message: MessageToBackground | MessageToPopup): void;
   onMessage: BrowserOnMessage;
 }
 
-interface Browser {
+export interface Browser {
   runtime: Runtime;
   tabs: BrowserTabs;
 }
 
-declare const browser: Browser;
+declare global {
+  const browser: Browser;
+}
