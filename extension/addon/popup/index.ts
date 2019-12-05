@@ -3,29 +3,38 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { MessageType, MessageToPopup, sendToContent, sendToBackground } from "addon/lib/messages";
 
-document.getElementById("generate").addEventListener("click", () => {
-  sendToBackground({
-    type: MessageType.GET_KEYS,
+const generate = document.getElementById("generate");
+if (generate) {
+  generate.addEventListener("click", () => {
+    sendToBackground({
+      type: MessageType.GET_KEYS,
+    });
   });
-});
+}
 
-document.getElementById("fetch-content").addEventListener("click", () => {
-  sendToContent({
-    type: MessageType.GET_CONTENT,
+const fetchContent = document.getElementById("fetch-content");
+if (fetchContent) {
+  fetchContent.addEventListener("click", () => {
+    sendToContent({
+      type: MessageType.GET_CONTENT,
+    });
   });
-});
+}
 
-document.getElementById("sign").addEventListener("click", () => {
-  const content = (document.getElementById("message") as HTMLInputElement).value;
-  const privateKey = (document.getElementById("privatekey") as HTMLInputElement).value;
-  const publicKey = (document.getElementById("publickey") as HTMLInputElement).value;
-  sendToBackground({
-    type: MessageType.SIGN_CONTENT,
-    content,
-    privateKey,
-    publicKey,
+const sign = document.getElementById("sign");
+if (sign) {
+  sign.addEventListener("click", () => {
+    const content = (document.getElementById("message") as HTMLInputElement).value;
+    const privateKey = (document.getElementById("privatekey") as HTMLInputElement).value;
+    const publicKey = (document.getElementById("publickey") as HTMLInputElement).value;
+    sendToBackground({
+      type: MessageType.SIGN_CONTENT,
+      content,
+      privateKey,
+      publicKey,
+    });
   });
-});
+}
 
 browser.runtime.onMessage.addListener((message: MessageToPopup) => {
   console.log("received message in popup", message);

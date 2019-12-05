@@ -1,11 +1,21 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "es6",
-    "sourceMap": true,
+    "allowUnreachableCode": false,
+    "alwaysStrict": true,
     "baseUrl": ".",
+    "module": "esnext",
     "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "suppressExcessPropertyErrors": false,
+    "suppressImplicitAnyIndexErrors": false,
+    "target": "es6",
     "paths": {
       "addon/*": [
         "addon/*"
