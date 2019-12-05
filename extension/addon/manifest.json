@@ -12,7 +12,7 @@
   "browser_action": {
     "default_icon": "icons/pen.png",
     "default_title": "SpotSign",
-    "default_popup": "popup/popup.html",
+    "default_popup": "popup/index.html",
     "browser_style": true
   },
   "background": {

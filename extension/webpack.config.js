@@ -5,9 +5,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    background_scripts: "./addon/background_scripts/background.ts",
-    content_scripts: "./addon/content_scripts/content.ts",
-    popup: "./addon/popup/popup.ts"
+    background_scripts: "./addon/background_scripts/index.ts",
+    content_scripts: "./addon/content_scripts/index.ts",
+    popup: "./addon/popup/index.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -27,7 +27,7 @@ module.exports = {
     new CopyPlugin([
       { from: './addon/manifest.json', to: 'manifest.json' },
       { from: './addon/icons/pen.png', to: 'icons/pen.png' },
-      { from: './addon/popup/popup.html', to: 'popup/popup.html' },
+      { from: './addon/popup/index.html', to: 'popup/index.html' },
 
     ]),
   ],
