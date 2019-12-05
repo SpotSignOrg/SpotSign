@@ -1,19 +1,23 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "target": "es6",
-        "sourceMap": true,
-        "baseUrl": ".",
-        "moduleResolution": "node",
-        "paths": {
-            "addon/*": ["addon/*"],
-            "signer/*": ["../signer/*"],
-        }
-    },
-    "include": [
-        "addon/**/*"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
-   }
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es6",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "paths": {
+      "addon/*": [
+        "addon/*"
+      ],
+      "signer/*": [
+        "../signer/*"
+      ],
+    }
+  },
+  "include": [
+    "addon/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

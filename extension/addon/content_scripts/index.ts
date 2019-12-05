@@ -1,13 +1,6 @@
-import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from 'addon/lib/messages';
+import { POPUP_GET_CONTENT, CONTENT_SEND_CONTENT } from "addon/lib/messages";
 
-declare global {
-  interface Window {
-    hasRun:any;
-  }
-  const browser:any;
-}
-
-(function() {
+(function(): void {
   /**
    * Check and set a global guard variable.
    * If this content script is injected into the same page again,
@@ -25,10 +18,11 @@ declare global {
   console.log("sending message from content", message);
   browser.runtime.sendMessage(message);
 
-  function getActiveContent() {
+  function getActiveContent(): string {
     const element = document.activeElement;
     console.log("Active element:", element);
-    const content = (<HTMLInputElement>document.activeElement).value || (<HTMLElement>document.activeElement).innerText;
+    const content =
+      (document.activeElement as HTMLInputElement).value || (document.activeElement as HTMLElement).innerText;
     console.log("Found content:", content);
     return content;
   }
@@ -40,10 +34,10 @@ declare global {
       const content = getActiveContent();
       const message = {
         message: CONTENT_SEND_CONTENT,
-        content
+        content,
       };
       console.log("sending message in content", message);
       browser.runtime.sendMessage(message);
-    };
+    }
   });
 })();
