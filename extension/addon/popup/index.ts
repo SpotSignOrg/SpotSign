@@ -4,23 +4,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { assertNever } from "addon/lib/never";
 import { MessageType, MessageToPopup, sendToContent, sendToBackground } from "addon/lib/messages";
 
-const generate = document.getElementById("generate");
-if (generate) {
-  generate.addEventListener("click", () => {
-    sendToBackground({
-      type: MessageType.GET_KEYS,
-    });
+(document.getElementById("generate") as HTMLElement).addEventListener("click", () => {
+  sendToBackground({
+    type: MessageType.GET_KEYS,
   });
-}
+});
 
-const fetchContent = document.getElementById("fetch-content");
-if (fetchContent) {
-  fetchContent.addEventListener("click", () => {
-    sendToContent({
-      type: MessageType.GET_CONTENT,
-    });
+(document.getElementById("fetch-content") as HTMLElement).addEventListener("click", () => {
+  sendToContent({
+    type: MessageType.GET_CONTENT,
   });
-}
+});
 
 const sign = document.getElementById("sign");
 if (sign) {
