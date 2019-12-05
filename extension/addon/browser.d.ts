@@ -12,15 +12,13 @@ export interface Tab {
   id: number;
 }
 
-export type Tabs = Array<Tab>;
-
 export interface TabQuery {
   currentWindow: boolean;
   active: boolean;
 }
 
 export interface BrowserTabs {
-  query: (_: TabQuery) => Promise<Tabs>;
+  query: (_: TabQuery) => Promise<Array<Tab>>;
   sendMessage: (tabId: number, message: MessageToContent) => void;
 }
 
