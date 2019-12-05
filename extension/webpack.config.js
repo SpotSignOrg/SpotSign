@@ -5,8 +5,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    background_scripts: "./addon/background_scripts/index.ts",
-    content_scripts: "./addon/content_scripts/index.ts",
+    background: "./addon/background/index.ts",
+    content: "./addon/content/index.ts",
     popup: "./addon/popup/index.ts"
   },
   output: {
