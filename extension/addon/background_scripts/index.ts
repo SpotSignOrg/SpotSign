@@ -2,7 +2,7 @@ const signerPkg = import("signer/pkg");
 
 import { assertNever } from "addon/lib/never";
 import { MessageType, MessageToBackground, sendToPopup } from "addon/lib/messages";
-import { Keys } from "addon/signer";
+import { Keys, Signature } from "addon/signer";
 
 signerPkg.then(signer => {
   browser.runtime.onMessage.addListener((message: MessageToBackground) => {
@@ -20,7 +20,7 @@ signerPkg.then(signer => {
       case MessageType.SIGN_CONTENT:
         const { content, privateKey, publicKey } = message;
         const datetime = new Date().toISOString();
-        const signature = signer.sign_message(privateKey, publicKey, content, datetime).signature;
+        const signature = (signer.sign_message(privateKey, publicKey, content, datetime) as Signature).signature;
         console.log("Signed:", signature);
         sendToPopup({
           type: MessageType.CONTENT_SIGNED,
