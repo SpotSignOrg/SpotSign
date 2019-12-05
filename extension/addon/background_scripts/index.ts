@@ -1,5 +1,6 @@
 const signerPkg = import("signer/pkg");
 
+import { assertNever } from "addon/lib/never";
 import { MessageType, MessageToBackground, sendToPopup } from "addon/lib/messages";
 import { Keys } from "addon/signer";
 
@@ -26,6 +27,8 @@ signerPkg.then(signer => {
           signature,
         });
         break;
+      default:
+        assertNever(message);
     }
   });
 });

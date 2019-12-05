@@ -1,6 +1,7 @@
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import { assertNever } from "addon/lib/never";
 import { MessageType, MessageToPopup, sendToContent, sendToBackground } from "addon/lib/messages";
 
 const generate = document.getElementById("generate");
@@ -53,5 +54,10 @@ browser.runtime.onMessage.addListener((message: MessageToPopup) => {
       console.log("received signature in popup", message.signature);
       (document.getElementById("signature") as HTMLInputElement).value = message.signature;
       break;
+    case MessageType.CONTENT_ALIVE:
+      console.log("received content alive in popup!");
+      break;
+    default:
+      assertNever(message);
   }
 });

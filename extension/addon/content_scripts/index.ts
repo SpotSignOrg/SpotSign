@@ -1,4 +1,4 @@
-import { MessageToPopup, MessageType, MessageToContent } from "addon/lib/messages";
+import { MessageType, MessageToContent, sendToPopup } from "addon/lib/messages";
 
 declare global {
   interface Window {
@@ -18,12 +18,7 @@ declare global {
   }
   window.hasRun = true;
 
-  function sendMessage(message: MessageToPopup): void {
-    console.log("sending message from content");
-    browser.runtime.sendMessage(message);
-  }
-
-  sendMessage({ type: MessageType.CONTENT_ALIVE });
+  sendToPopup({ type: MessageType.CONTENT_ALIVE });
 
   function getActiveContent(): string {
     const element = document.activeElement;
@@ -40,10 +35,11 @@ declare global {
     switch (message.type) {
       case MessageType.GET_CONTENT:
         const content = getActiveContent();
-        sendMessage({
+        sendToPopup({
           type: MessageType.SEND_CONTENT,
           content,
         });
+        break;
     }
   });
 })();

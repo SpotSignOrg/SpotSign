@@ -1,8 +1,8 @@
 import { Keys } from "addon/signer";
 
 export enum MessageType {
-  GET_CONTENT = "popupGetContent",
-  SEND_CONTENT = "contentSendContent",
+  GET_CONTENT = "getContent",
+  SEND_CONTENT = "sendContent",
   GET_KEYS = "getKeys",
   SEND_KEYS = "sendKeys",
   SIGN_CONTENT = "signContent",
