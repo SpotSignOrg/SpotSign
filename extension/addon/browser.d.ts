@@ -1,29 +1,29 @@
 import { Message, MessageToContent, MessageToBackground, MessageToPopup } from "addon/lib/messages";
 
-export interface BrowserOnMessage {
+interface BrowserOnMessage {
   addListener(handler: (message: Message) => void): void;
 }
 
-export interface Tab {
+interface Tab {
   id: number;
 }
 
-export interface TabQuery {
+interface TabQuery {
   currentWindow: boolean;
   active: boolean;
 }
 
-export interface BrowserTabs {
+interface BrowserTabs {
   query: (_: TabQuery) => Promise<Array<Tab>>;
   sendMessage: (tabId: number, message: MessageToContent) => void;
 }
 
-export interface Runtime {
+interface Runtime {
   sendMessage(message: MessageToBackground | MessageToPopup): void;
   onMessage: BrowserOnMessage;
 }
 
-export interface Browser {
+interface Browser {
   runtime: Runtime;
   tabs: BrowserTabs;
 }
