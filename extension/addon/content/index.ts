@@ -1,4 +1,10 @@
-import { MessageTarget, MessageType, MessageToContent, sendToPopup, listen } from "addon/lib/messages";
+import {
+  MessageTarget,
+  MessageType,
+  MessageToContent,
+  sendToPopup,
+  listen,
+} from "addon/lib/messages";
 
 declare global {
   interface Window {
@@ -18,13 +24,17 @@ declare global {
   }
   window.hasRun = true;
 
-  sendToPopup({ type: MessageType.CONTENT_ALIVE, sender: MessageTarget.CONTENT });
+  sendToPopup({
+    type: MessageType.CONTENT_ALIVE,
+    sender: MessageTarget.CONTENT,
+  });
 
   function getActiveContent(): string {
     const element = document.activeElement;
     console.log("Active element:", element);
     const content =
-      (document.activeElement as HTMLInputElement).value || (document.activeElement as HTMLElement).innerText;
+      (document.activeElement as HTMLInputElement).value ||
+      (document.activeElement as HTMLElement).innerText;
     console.log("Found content:", content);
     return content;
   }
@@ -33,11 +43,10 @@ declare global {
   listen(MessageTarget.CONTENT, (message: MessageToContent) => {
     switch (message.type) {
       case MessageType.GET_CONTENT:
-        const content = getActiveContent();
         sendToPopup({
           type: MessageType.SEND_CONTENT,
           sender: MessageTarget.CONTENT,
-          content,
+          content: getActiveContent(),
         });
         break;
     }

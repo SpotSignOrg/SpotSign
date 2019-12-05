@@ -11,6 +11,14 @@ import {
   listen,
 } from "addon/lib/messages";
 
+function htmlGet(id: string): string {
+  return (document.getElementById(id) as HTMLInputElement).value;
+}
+
+function htmlSet(id: string, value: string): void {
+  (document.getElementById(id) as HTMLInputElement).value = value;
+}
+
 (document.getElementById("generate") as HTMLElement).addEventListener("click", () => {
   sendToBackground({
     type: MessageType.GET_KEYS,
@@ -28,15 +36,12 @@ import {
 const sign = document.getElementById("sign");
 if (sign) {
   sign.addEventListener("click", () => {
-    const content = (document.getElementById("message") as HTMLInputElement).value;
-    const privateKey = (document.getElementById("privatekey") as HTMLInputElement).value;
-    const publicKey = (document.getElementById("publickey") as HTMLInputElement).value;
     sendToBackground({
       type: MessageType.SIGN_CONTENT,
       sender: MessageTarget.POPUP,
-      content,
-      privateKey,
-      publicKey,
+      content: htmlGet("message"),
+      privateKey: htmlGet("privatekey"),
+      publicKey: htmlGet("publickey"),
     });
   });
 }
@@ -44,14 +49,14 @@ if (sign) {
 listen(MessageTarget.POPUP, (message: MessageToPopup) => {
   switch (message.type) {
     case MessageType.SEND_KEYS:
-      (document.getElementById("privatekey") as HTMLInputElement).value = message.keys.private_key;
-      (document.getElementById("publickey") as HTMLInputElement).value = message.keys.public_key;
+      htmlSet("privatekey", message.keys.private_key);
+      htmlSet("publickey", message.keys.public_key);
       break;
     case MessageType.SEND_CONTENT:
-      (document.getElementById("message") as HTMLInputElement).value = message.content;
+      htmlSet("message", message.content);
       break;
     case MessageType.CONTENT_SIGNED:
-      (document.getElementById("signature") as HTMLInputElement).value = message.signature;
+      htmlSet("signature", message.signature);
       break;
     case MessageType.CONTENT_ALIVE:
       break;

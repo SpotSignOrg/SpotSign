@@ -52,7 +52,11 @@ export interface MessageSendContent extends MessageWithSender {
   content: string;
 }
 
-export type MessageToPopup = MessageSendKeys | MessageContentSigned | MessageContentAlive | MessageSendContent;
+export type MessageToPopup =
+  | MessageSendKeys
+  | MessageContentSigned
+  | MessageContentAlive
+  | MessageSendContent;
 
 export interface MessageGetContent extends MessageWithSender {
   type: MessageType.GET_CONTENT;
