@@ -1,9 +1,5 @@
 import { Message, MessageToContent, MessageToBackground, MessageToPopup } from "addon/lib/messages";
 
-export interface Window {
-  hasRun: boolean;
-}
-
 export interface BrowserOnMessage {
   addListener(handler: (message: Message) => void): void;
 }
