@@ -28,13 +28,14 @@
     "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^4.4.1",
     "copy-webpack-plugin": "^5.0.5",
     "css-loader": "^3.2.0",
     "html-loader": "^0.5.5",
     "jquery": "^3.4.1",
     "popper.js": "^1.16.0",
     "react": "^16.12.0",
+    "react-bootstrap": "^1.0.0-beta.16",
     "react-dom": "^16.12.0",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",

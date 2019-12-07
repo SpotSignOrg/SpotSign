@@ -1,4 +1,9 @@
 import * as React from "React";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 import {
   listen,
@@ -72,88 +77,82 @@ export default class Popup extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <div className="row my-4">
-          <div className="col">
+      <Container>
+        <Row className="my-4">
+          <Col>
             <h3>SpotSign</h3>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <label>Private Key</label>
-              <input className="form-control" value={this.state.privateKey} />
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Private Key</Form.Label>
+              <Form.Control value={this.state.privateKey} />
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <label>Public Key</label>
-              <input className="form-control" value={this.state.publicKey} />
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Public Key</Form.Label>
+              <Form.Control value={this.state.publicKey} />
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <button className="btn btn-primary" onClick={this.handleGetKeys}>
-                Generate Keys
-              </button>
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Button onClick={this.handleGetKeys}>Generate Keys</Button>
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <label>Author</label>
-              <input className="form-control" value="Jared" />
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Author</Form.Label>
+              <Form.Control value="Jared" />
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <label>Content</label>
-              <input className="form-control" value={this.state.content} />
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Content</Form.Label>
+              <Form.Control value={this.state.content} />
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <button className="btn btn-primary" onClick={this.handleGetContent}>
-                Fetch Content
-              </button>
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Button onClick={this.handleGetContent}>Fetch Content</Button>
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <label>Signature</label>
-              <input className="form-control" value={this.state.signature} />
-            </div>
-          </div>
-        </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Signature</Form.Label>
+              <Form.Control value={this.state.signature} />
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
-            <div className="form-group">
-              <button className="btn btn-primary" onClick={this.handleSignContent}>
-                Sign
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Button onClick={this.handleSignContent}>Sign</Button>
+            </Form.Group>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }
