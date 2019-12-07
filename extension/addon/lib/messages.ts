@@ -16,15 +16,16 @@ export enum MessageType {
   CONTENT_ALIVE = "contentAlive",
 }
 
-interface MessageWithSender {
+interface MessageBase {
+  type: string;
   sender: MessageTarget;
 }
 
-export interface MessageGetKeys extends MessageWithSender {
+export interface MessageGetKeys extends MessageBase {
   type: MessageType.GET_KEYS;
 }
 
-export interface MessageSignContent extends MessageWithSender {
+export interface MessageSignContent extends MessageBase {
   type: MessageType.SIGN_CONTENT;
   publicKey: string;
   privateKey: string;
@@ -33,21 +34,21 @@ export interface MessageSignContent extends MessageWithSender {
 
 export type MessageToBackground = MessageGetKeys | MessageSignContent;
 
-export interface MessageSendKeys extends MessageWithSender {
+export interface MessageSendKeys extends MessageBase {
   type: MessageType.SEND_KEYS;
   keys: Keys;
 }
 
-export interface MessageContentSigned extends MessageWithSender {
+export interface MessageContentSigned extends MessageBase {
   type: MessageType.CONTENT_SIGNED;
   signature: string;
 }
 
-export interface MessageContentAlive extends MessageWithSender {
+export interface MessageContentAlive extends MessageBase {
   type: MessageType.CONTENT_ALIVE;
 }
 
-export interface MessageSendContent extends MessageWithSender {
+export interface MessageSendContent extends MessageBase {
   type: MessageType.SEND_CONTENT;
   content: string;
 }
@@ -58,7 +59,7 @@ export type MessageToPopup =
   | MessageContentAlive
   | MessageSendContent;
 
-export interface MessageGetContent extends MessageWithSender {
+export interface MessageGetContent extends MessageBase {
   type: MessageType.GET_CONTENT;
 }
 
