@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "allowUnreachableCode": false,
     "alwaysStrict": true,
     "baseUrl": ".",

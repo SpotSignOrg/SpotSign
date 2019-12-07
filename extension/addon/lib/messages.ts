@@ -67,7 +67,7 @@ export type MessageToContent = MessageGetContent;
 
 export type Message = MessageToBackground | MessageToPopup | MessageToContent;
 
-export function sendToContent(message: MessageToContent): void {
+export function sendToContent(message: MessageToContent) {
   browser.tabs
     .query({
       currentWindow: true,
@@ -82,17 +82,17 @@ export function sendToContent(message: MessageToContent): void {
     .catch(console.log);
 }
 
-export function sendToBackground(message: MessageToBackground): void {
+export function sendToBackground(message: MessageToBackground) {
   console.log("Sending message to background", message);
   browser.runtime.sendMessage(message);
 }
 
-export function sendToPopup(message: MessageToPopup): void {
+export function sendToPopup(message: MessageToPopup) {
   console.log("Sending message to popup", message);
   browser.runtime.sendMessage(message);
 }
 
-export function listen(receiver: MessageTarget, listener: (_: Message) => void): void {
+export function listen(receiver: MessageTarget, listener: (_: Message) => void) {
   browser.runtime.onMessage.addListener((message: Message) => {
     console.log(`Received message in ${receiver}:`, message);
     listener(message);

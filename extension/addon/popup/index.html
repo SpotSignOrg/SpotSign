@@ -1,93 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="utf-8">
     <title>SpotSign</title>
   </head>
 
   <body>
-    <div class="container">
-      <div class="row my-4">
-        <div class="col">
-          <h3>SpotSign</h3>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="privatekey">Private Key</label>
-            <input id="privatekey" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="publickey">Public Key</label>
-            <input id="publickey" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <button id="generate" class="btn btn-primary">Generate Keys</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="author">Author</label>
-            <input id="author" class="form-control" value="Jared">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="message">Message</label>
-            <input id="message" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <button id="fetch-content" class="btn btn-primary">Fetch Content</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <label for="signature">Signature</label>
-            <input id="signature" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <div class="form-group">
-            <button id="sign" class="btn btn-primary">Sign</button>
-            <button id="verify" class="btn btn-primary">Verify</button>
-            <span id="verification"></span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
+    <div id="mount"></div>
     <script src="index.js"></script>
   </body>
-
 </html>
