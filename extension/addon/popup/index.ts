@@ -19,32 +19,33 @@ function htmlSet(id: string, value: string): void {
   (document.getElementById(id) as HTMLInputElement).value = value;
 }
 
-(document.getElementById("generate") as HTMLElement).addEventListener("click", () => {
+function htmlClick(id: string, handler: () => void): void {
+  (document.getElementById(id) as HTMLElement).addEventListener("click", handler);
+}
+
+htmlClick("generate", () => {
   sendToBackground({
     type: MessageType.GET_KEYS,
     sender: MessageTarget.POPUP,
   });
 });
 
-(document.getElementById("fetch-content") as HTMLElement).addEventListener("click", () => {
+htmlClick("fetch-content", () => {
   sendToContent({
     type: MessageType.GET_CONTENT,
     sender: MessageTarget.POPUP,
   });
 });
 
-const sign = document.getElementById("sign");
-if (sign) {
-  sign.addEventListener("click", () => {
-    sendToBackground({
-      type: MessageType.SIGN_CONTENT,
-      sender: MessageTarget.POPUP,
-      content: htmlGet("message"),
-      privateKey: htmlGet("privatekey"),
-      publicKey: htmlGet("publickey"),
-    });
+htmlClick("sign", () => {
+  sendToBackground({
+    type: MessageType.SIGN_CONTENT,
+    sender: MessageTarget.POPUP,
+    content: htmlGet("message"),
+    privateKey: htmlGet("privatekey"),
+    publicKey: htmlGet("publickey"),
   });
-}
+});
 
 listen(MessageTarget.POPUP, (message: MessageToPopup) => {
   switch (message.type) {
