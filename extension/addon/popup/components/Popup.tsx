@@ -65,7 +65,6 @@ export default class Popup extends React.Component {
   };
 
   handleSignContent = () => {
-    console.log(this);
     sendToBackground({
       type: MessageType.SIGN_CONTENT,
       sender: MessageTarget.POPUP,
