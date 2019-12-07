@@ -74,7 +74,7 @@ export function sendToContent(message: MessageToContent): void {
     })
     .then(tabs => {
       for (const tab of tabs) {
-        console.log("sending message from popup", message, "to tab", tab.id);
+        console.log("Sending message", message, "to content tab", tab.id);
         browser.tabs.sendMessage(tab.id, message);
       }
     })
