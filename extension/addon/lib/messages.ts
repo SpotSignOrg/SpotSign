@@ -67,19 +67,15 @@ export type MessageToContent = MessageGetContent;
 
 export type Message = MessageToBackground | MessageToPopup | MessageToContent;
 
-export function sendToContent(message: MessageToContent) {
-  browser.tabs
-    .query({
-      currentWindow: true,
-      active: true,
-    })
-    .then(tabs => {
-      for (const tab of tabs) {
-        console.log("Sending message", message, "to content tab", tab.id);
-        browser.tabs.sendMessage(tab.id, message);
-      }
-    })
-    .catch(console.log);
+export async function sendToContent(message: MessageToContent) {
+  const tabs = await browser.tabs.query({
+    currentWindow: true,
+    active: true,
+  });
+  for (const tab of tabs) {
+    console.log("Sending message", message, "to content tab", tab.id);
+    browser.tabs.sendMessage(tab.id, message);
+  }
 }
 
 export function sendToBackground(message: MessageToBackground) {

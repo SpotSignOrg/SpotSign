@@ -10,7 +10,8 @@ import {
 } from "addon/lib/messages";
 import { Keys, Signature } from "addon/signer";
 
-signerPkg.then(signer => {
+(async () => {
+  const signer = await signerPkg;
   listen(MessageTarget.BACKGROUND, (message: MessageToBackground) => {
     switch (message.type) {
       case MessageType.GET_KEYS:
@@ -36,4 +37,4 @@ signerPkg.then(signer => {
         assertNever(message);
     }
   });
-});
+})();

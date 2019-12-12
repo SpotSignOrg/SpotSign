@@ -14,7 +14,7 @@ interface TabQuery {
 }
 
 interface BrowserTabs {
-  query: (_: TabQuery) => Promise<Array<Tab>>;
+  query: (_: TabQuery) => Promise<Tab[]>;
   sendMessage: (tabId: number, message: MessageToContent) => void;
 }
 
