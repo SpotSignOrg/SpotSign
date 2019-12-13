@@ -4,10 +4,10 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import { useContent, ContentActions } from "addon/popup/state/content";
+import { useContent } from "addon/popup/state/content";
 
 export default function ContentManager() {
-  const [content, contentDispatch] = useContent();
+  const { content, getContent } = useContent();
   return (
     <React.Fragment>
       <Row>
@@ -21,9 +21,7 @@ export default function ContentManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => contentDispatch({ type: ContentActions.GET_CONTENT })}>
-              Fetch Content
-            </Button>
+            <Button onClick={getContent}>Fetch Content</Button>
           </Form.Group>
         </Col>
       </Row>

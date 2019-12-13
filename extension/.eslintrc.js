@@ -20,7 +20,8 @@ module.exports = {
     "promise/prefer-await-to-callbacks": "error",
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-empty-function": "off"
   },
   settings: {
     "react": {

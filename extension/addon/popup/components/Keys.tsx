@@ -4,10 +4,10 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import { useKeys, KeyActions } from "addon/popup/state/keys";
+import { useKeys } from "addon/popup/state/keys";
 
 export default function KeyManager() {
-  const [keys, keysDispatch] = useKeys();
+  const { keys, getKeys } = useKeys();
   return (
     <React.Fragment>
       <Row>
@@ -31,9 +31,7 @@ export default function KeyManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => keysDispatch({ type: KeyActions.GET_KEYS })}>
-              Generate Keys
-            </Button>
+            <Button onClick={getKeys}>Generate Keys</Button>
           </Form.Group>
         </Col>
       </Row>
