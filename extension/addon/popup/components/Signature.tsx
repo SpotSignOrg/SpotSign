@@ -16,7 +16,7 @@ export default function SignatureManager({ signature, handleGetSignature }: Sign
         <Col>
           <Form.Group>
             <Form.Label>Signature</Form.Label>
-            <Form.Control value={signature} />
+            <Form.Control readOnly value={signature} />
           </Form.Group>
         </Col>
       </Row>

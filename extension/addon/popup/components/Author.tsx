@@ -14,7 +14,7 @@ export default function AuthorManager({ author }: AuthorProps) {
         <Col>
           <Form.Group>
             <Form.Label>Author</Form.Label>
-            <Form.Control value={author} />
+            <Form.Control readOnly value={author} />
           </Form.Group>
         </Col>
       </Row>

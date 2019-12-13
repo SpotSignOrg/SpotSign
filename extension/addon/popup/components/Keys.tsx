@@ -17,7 +17,7 @@ export default function KeyManager({ privateKey, publicKey, handleGetKeys }: Key
         <Col>
           <Form.Group>
             <Form.Label>Private Key</Form.Label>
-            <Form.Control value={privateKey} />
+            <Form.Control readOnly value={privateKey} />
           </Form.Group>
         </Col>
       </Row>
@@ -26,7 +26,7 @@ export default function KeyManager({ privateKey, publicKey, handleGetKeys }: Key
         <Col>
           <Form.Group>
             <Form.Label>Public Key</Form.Label>
-            <Form.Control value={publicKey} />
+            <Form.Control readOnly value={publicKey} />
           </Form.Group>
         </Col>
       </Row>

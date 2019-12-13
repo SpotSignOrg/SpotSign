@@ -16,7 +16,7 @@ export default function ContentManager({ content, handleGetContent }: ContentPro
         <Col>
           <Form.Group>
             <Form.Label>Content</Form.Label>
-            <Form.Control value={content} />
+            <Form.Control readOnly value={content} />
           </Form.Group>
         </Col>
       </Row>
