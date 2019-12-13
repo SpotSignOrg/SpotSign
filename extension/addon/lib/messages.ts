@@ -13,7 +13,6 @@ export enum MessageType {
   SEND_KEYS = "sendKeys",
   GET_SIGNATURE = "getSignature",
   SEND_SIGNATURE = "sendSignature",
-  CONTENT_ALIVE = "contentAlive",
 }
 
 interface MessageBase {
@@ -39,13 +38,9 @@ export interface MessageSendKeys extends MessageBase {
   keys: Keys;
 }
 
-export interface MessageContentSigned extends MessageBase {
+export interface MessageSendSignature extends MessageBase {
   type: MessageType.SEND_SIGNATURE;
   signature: string;
-}
-
-export interface MessageContentAlive extends MessageBase {
-  type: MessageType.CONTENT_ALIVE;
 }
 
 export interface MessageSendContent extends MessageBase {
@@ -53,11 +48,7 @@ export interface MessageSendContent extends MessageBase {
   content: string;
 }
 
-export type MessageToPopup =
-  | MessageSendKeys
-  | MessageContentSigned
-  | MessageContentAlive
-  | MessageSendContent;
+export type MessageToPopup = MessageSendKeys | MessageSendSignature | MessageSendContent;
 
 export interface MessageGetContent extends MessageBase {
   type: MessageType.GET_CONTENT;
@@ -89,7 +80,7 @@ export function sendToPopup(message: MessageToPopup) {
 }
 
 export function listen(receiver: MessageTarget, listener: (_: Message) => void) {
-  browser.runtime.onMessage.addListener((message: Message) => {
+  return browser.runtime.onMessage.addListener((message: Message) => {
     console.log(`Received message in ${receiver}:`, message);
     listener(message);
   });

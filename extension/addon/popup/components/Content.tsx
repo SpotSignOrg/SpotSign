@@ -1,20 +1,20 @@
 import * as React from "react";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 
-import { useContent } from "addon/popup/state/content";
+import { useState } from "addon/popup/state";
 
 export default function ContentManager() {
-  const { content, getContent } = useContent();
+  const { state, getContent } = useState();
   return (
     <React.Fragment>
       <Row>
         <Col>
           <Form.Group>
             <Form.Label>Content</Form.Label>
-            <Form.Control readOnly value={content} />
+            <Form.Control readOnly value={state.content} />
           </Form.Group>
         </Col>
       </Row>

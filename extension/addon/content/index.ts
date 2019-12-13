@@ -24,11 +24,6 @@ declare global {
   }
   window.hasRun = true;
 
-  sendToPopup({
-    type: MessageType.CONTENT_ALIVE,
-    sender: MessageTarget.CONTENT,
-  });
-
   function getActiveContent(): string {
     const element = document.activeElement;
     console.log("Active element:", element);

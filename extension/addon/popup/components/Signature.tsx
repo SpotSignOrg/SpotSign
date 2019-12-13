@@ -4,14 +4,10 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import { useKeys } from "addon/popup/state/keys";
-import { useContent } from "addon/popup/state/content";
-import { useSignature } from "addon/popup/state/signature";
+import { useState } from "addon/popup/state";
 
 export default function SignatureManager() {
-  const { keys } = useKeys();
-  const { content } = useContent();
-  const { signature, getSignature } = useSignature();
+  const { state, getSignature } = useState();
 
   return (
     <React.Fragment>
@@ -19,16 +15,14 @@ export default function SignatureManager() {
         <Col>
           <Form.Group>
             <Form.Label>Signature</Form.Label>
-            <Form.Control readOnly value={signature} />
+            <Form.Control readOnly value={state.signature} />
           </Form.Group>
         </Col>
       </Row>
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => getSignature(content, keys.privateKey, keys.publicKey)}>
-              Sign Content
-            </Button>
+            <Button onClick={getSignature}>Sign Content</Button>
           </Form.Group>
         </Col>
       </Row>
