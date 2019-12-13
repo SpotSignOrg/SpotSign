@@ -1,7 +1,9 @@
 import { Message, MessageToContent, MessageToBackground, MessageToPopup } from "addon/lib/messages";
 
 interface BrowserOnMessage {
-  addListener(handler: (message: Message) => void): void;
+  addListener(
+    handler: (message: Message, sender: void, sendResponse: (message: Message) => void) => void,
+  ): void;
 }
 
 interface Tab {
@@ -15,11 +17,11 @@ interface TabQuery {
 
 interface BrowserTabs {
   query: (_: TabQuery) => Promise<Tab[]>;
-  sendMessage: (tabId: number, message: MessageToContent) => void;
+  sendMessage(tabId: number, message: MessageToContent): Promise<Message>;
 }
 
 interface Runtime {
-  sendMessage(message: MessageToBackground | MessageToPopup): void;
+  sendMessage(message: MessageToBackground | MessageToPopup): Promise<Message>;
   onMessage: BrowserOnMessage;
 }
 

@@ -1,10 +1,4 @@
-import {
-  MessageTarget,
-  MessageType,
-  MessageToContent,
-  sendToPopup,
-  listen,
-} from "addon/lib/messages";
+import { MessageTarget, MessageType, MessageToContent, listen } from "addon/lib/messages";
 
 declare global {
   interface Window {
@@ -38,12 +32,11 @@ declare global {
   listen(MessageTarget.CONTENT, (message: MessageToContent) => {
     switch (message.type) {
       case MessageType.GET_CONTENT:
-        sendToPopup({
+        return {
           type: MessageType.SEND_CONTENT,
           sender: MessageTarget.CONTENT,
           content: getActiveContent(),
-        });
-        break;
+        };
     }
   });
 })();

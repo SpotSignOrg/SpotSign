@@ -1,13 +1,7 @@
 const signerPkg = import("signer/pkg");
 
 import { assertNever } from "addon/lib/never";
-import {
-  MessageTarget,
-  MessageType,
-  MessageToBackground,
-  sendToPopup,
-  listen,
-} from "addon/lib/messages";
+import { MessageTarget, MessageType, MessageToBackground, listen } from "addon/lib/messages";
 import { Keys, Signature } from "addon/signer";
 
 (async () => {
@@ -15,14 +9,13 @@ import { Keys, Signature } from "addon/signer";
   listen(MessageTarget.BACKGROUND, (message: MessageToBackground) => {
     switch (message.type) {
       case MessageType.GET_KEYS:
-        sendToPopup({
+        return {
           type: MessageType.SEND_KEYS,
           sender: MessageTarget.BACKGROUND,
           keys: signer.get_keys() as Keys,
-        });
-        break;
+        };
       case MessageType.GET_SIGNATURE:
-        sendToPopup({
+        return {
           type: MessageType.SEND_SIGNATURE,
           sender: MessageTarget.BACKGROUND,
           signature: (signer.sign_message(
@@ -31,10 +24,9 @@ import { Keys, Signature } from "addon/signer";
             message.content,
             new Date().toISOString(),
           ) as Signature).signature,
-        });
-        break;
+        };
       default:
-        assertNever(message);
+        return assertNever(message);
     }
   });
 })();

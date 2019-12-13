@@ -63,25 +63,31 @@ export async function sendToContent(message: MessageToContent) {
     currentWindow: true,
     active: true,
   });
+  const responses = [];
   for (const tab of tabs) {
     console.log("Sending message", message, "to content tab", tab.id);
-    browser.tabs.sendMessage(tab.id, message);
+    responses.push(browser.tabs.sendMessage(tab.id, message));
   }
+  const response = await Promise.all(responses);
+  console.log("Responded with", response);
+  return response;
 }
 
 export function sendToBackground(message: MessageToBackground) {
   console.log("Sending message to background", message);
-  browser.runtime.sendMessage(message);
+  return browser.runtime.sendMessage(message);
 }
 
 export function sendToPopup(message: MessageToPopup) {
   console.log("Sending message to popup", message);
-  browser.runtime.sendMessage(message);
+  return browser.runtime.sendMessage(message);
 }
 
-export function listen(receiver: MessageTarget, listener: (_: Message) => void) {
-  return browser.runtime.onMessage.addListener((message: Message) => {
+export function listen(receiver: MessageTarget, listener: (_: Message) => Message) {
+  return browser.runtime.onMessage.addListener((message: Message, _, sendResponse) => {
     console.log(`Received message in ${receiver}:`, message);
-    listener(message);
+    const response = listener(message);
+    console.log(`Responded with`, response);
+    sendResponse(response);
   });
 }
