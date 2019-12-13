@@ -11,8 +11,8 @@ export enum MessageType {
   SEND_CONTENT = "sendContent",
   GET_KEYS = "getKeys",
   SEND_KEYS = "sendKeys",
-  SIGN_CONTENT = "signContent",
-  CONTENT_SIGNED = "contentSigned",
+  GET_SIGNATURE = "getSignature",
+  SEND_SIGNATURE = "sendSignature",
   CONTENT_ALIVE = "contentAlive",
 }
 
@@ -26,7 +26,7 @@ export interface MessageGetKeys extends MessageBase {
 }
 
 export interface MessageSignContent extends MessageBase {
-  type: MessageType.SIGN_CONTENT;
+  type: MessageType.GET_SIGNATURE;
   publicKey: string;
   privateKey: string;
   content: string;
@@ -40,7 +40,7 @@ export interface MessageSendKeys extends MessageBase {
 }
 
 export interface MessageContentSigned extends MessageBase {
-  type: MessageType.CONTENT_SIGNED;
+  type: MessageType.SEND_SIGNATURE;
   signature: string;
 }
 

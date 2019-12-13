@@ -4,20 +4,17 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-interface KeyManagerProps {
-  privateKey: string;
-  publicKey: string;
-  handleGetKeys: () => void;
-}
+import { useKeys, KeyActions } from "addon/popup/state/keys";
 
-export default function KeyManager({ privateKey, publicKey, handleGetKeys }: KeyManagerProps) {
+export default function KeyManager() {
+  const [keys, keysDispatch] = useKeys();
   return (
     <React.Fragment>
       <Row>
         <Col>
           <Form.Group>
             <Form.Label>Private Key</Form.Label>
-            <Form.Control readOnly value={privateKey} />
+            <Form.Control readOnly value={keys.privateKey} />
           </Form.Group>
         </Col>
       </Row>
@@ -26,7 +23,7 @@ export default function KeyManager({ privateKey, publicKey, handleGetKeys }: Key
         <Col>
           <Form.Group>
             <Form.Label>Public Key</Form.Label>
-            <Form.Control readOnly value={publicKey} />
+            <Form.Control readOnly value={keys.publicKey} />
           </Form.Group>
         </Col>
       </Row>
@@ -34,7 +31,9 @@ export default function KeyManager({ privateKey, publicKey, handleGetKeys }: Key
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={handleGetKeys}>Generate Keys</Button>
+            <Button onClick={() => keysDispatch({ type: KeyActions.GET_KEYS })}>
+              Generate Keys
+            </Button>
           </Form.Group>
         </Col>
       </Row>

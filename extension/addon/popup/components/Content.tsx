@@ -4,12 +4,10 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-interface ContentProps {
-  content: string;
-  handleGetContent: () => void;
-}
+import { useContent, ContentActions } from "addon/popup/state/content";
 
-export default function ContentManager({ content, handleGetContent }: ContentProps) {
+export default function ContentManager() {
+  const [content, contentDispatch] = useContent();
   return (
     <React.Fragment>
       <Row>
@@ -23,7 +21,9 @@ export default function ContentManager({ content, handleGetContent }: ContentPro
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={handleGetContent}>Fetch Content</Button>
+            <Button onClick={() => contentDispatch({ type: ContentActions.GET_CONTENT })}>
+              Fetch Content
+            </Button>
           </Form.Group>
         </Col>
       </Row>

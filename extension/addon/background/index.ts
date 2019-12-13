@@ -21,9 +21,9 @@ import { Keys, Signature } from "addon/signer";
           keys: signer.get_keys() as Keys,
         });
         break;
-      case MessageType.SIGN_CONTENT:
+      case MessageType.GET_SIGNATURE:
         sendToPopup({
-          type: MessageType.CONTENT_SIGNED,
+          type: MessageType.SEND_SIGNATURE,
           sender: MessageTarget.BACKGROUND,
           signature: (signer.sign_message(
             message.privateKey,

@@ -4,12 +4,15 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-interface SignatureProps {
-  signature: string;
-  handleGetSignature: () => void;
-}
+import { useKeys } from "addon/popup/state/keys";
+import { useContent } from "addon/popup/state/content";
+import { useSignature, SignatureActions } from "addon/popup/state/signature";
 
-export default function SignatureManager({ signature, handleGetSignature }: SignatureProps) {
+export default function SignatureManager() {
+  const [keys] = useKeys();
+  const [content] = useContent();
+  const [signature, signatureDispatch] = useSignature();
+
   return (
     <React.Fragment>
       <Row>
@@ -23,7 +26,18 @@ export default function SignatureManager({ signature, handleGetSignature }: Sign
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={handleGetSignature}>Sign Content</Button>
+            <Button
+              onClick={() =>
+                signatureDispatch({
+                  type: SignatureActions.GET_SIGNATURE,
+                  privateKey: keys.privateKey,
+                  publicKey: keys.publicKey,
+                  content: content,
+                })
+              }
+            >
+              Sign Content
+            </Button>
           </Form.Group>
         </Col>
       </Row>
