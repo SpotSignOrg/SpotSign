@@ -17,7 +17,10 @@ module.exports = {
     "eslint(@typescript-eslint/camelcase)": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "promise/prefer-await-to-then": "error",
-    "promise/prefer-await-to-callbacks": "error"
+    "promise/prefer-await-to-callbacks": "error",
+    "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
   settings: {
     "react": {
@@ -25,5 +28,5 @@ module.exports = {
       "version": "detect"
     }
   },
-  plugins: ["promise"]
+  plugins: ["promise", "react-hooks"]
 };  

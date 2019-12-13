@@ -1,9 +1,7 @@
-import * as React from "React";
+import * as React from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 
 import {
   listen,
@@ -14,33 +12,35 @@ import {
   sendToContent,
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
+import Keys from "addon/popup/components/Keys";
+import Content from "addon/popup/components/Content";
+import Author from "addon/popup/components/Author";
+import Signature from "addon/popup/components/Signature";
 
-export default class Popup extends React.Component {
-  state = {
+export default function Popup() {
+  const [keys, setKeys] = React.useState({
     privateKey: "",
     publicKey: "",
-    content: "",
-    signature: "",
-  };
+  });
 
-  componentDidMount = () => {
+  const [content, setContent] = React.useState("");
+
+  const [signature, setSignature] = React.useState("");
+
+  React.useEffect(() => {
     listen(MessageTarget.POPUP, (message: MessageToPopup) => {
       switch (message.type) {
         case MessageType.SEND_KEYS:
-          this.setState({
+          setKeys({
             privateKey: message.keys.private_key,
             publicKey: message.keys.public_key,
           });
           break;
         case MessageType.SEND_CONTENT:
-          this.setState({
-            content: message.content,
-          });
+          setContent(message.content);
           break;
         case MessageType.CONTENT_SIGNED:
-          this.setState({
-            signature: message.signature,
-          });
+          setSignature(message.signature);
           break;
         case MessageType.CONTENT_ALIVE:
           break;
@@ -48,110 +48,47 @@ export default class Popup extends React.Component {
           assertNever(message);
       }
     });
-  };
+  });
 
-  handleGetKeys = () => {
+  const handleGetKeys = () => {
     sendToBackground({
       type: MessageType.GET_KEYS,
       sender: MessageTarget.POPUP,
     });
   };
 
-  handleGetContent = () => {
+  const handleGetContent = () => {
     sendToContent({
       type: MessageType.GET_CONTENT,
       sender: MessageTarget.POPUP,
     });
   };
 
-  handleSignContent = () => {
+  const handleSignContent = () => {
     sendToBackground({
       type: MessageType.SIGN_CONTENT,
       sender: MessageTarget.POPUP,
-      content: this.state.content,
-      privateKey: this.state.privateKey,
-      publicKey: this.state.publicKey,
+      content: content,
+      privateKey: keys.privateKey,
+      publicKey: keys.publicKey,
     });
   };
 
-  render() {
-    return (
-      <Container>
-        <Row className="my-4">
-          <Col>
-            <h3>SpotSign</h3>
-          </Col>
-        </Row>
+  return (
+    <Container>
+      <Row className="my-4">
+        <Col>
+          <h3>SpotSign</h3>
+        </Col>
+      </Row>
 
-        <Row>
-          <Col>
-            <Form.Group>
-              <Form.Label>Private Key</Form.Label>
-              <Form.Control value={this.state.privateKey} />
-            </Form.Group>
-          </Col>
-        </Row>
+      <Keys privateKey={keys.privateKey} publicKey={keys.publicKey} handleGetKeys={handleGetKeys} />
 
-        <Row>
-          <Col>
-            <Form.Group>
-              <Form.Label>Public Key</Form.Label>
-              <Form.Control value={this.state.publicKey} />
-            </Form.Group>
-          </Col>
-        </Row>
+      <Author author="Jared" />
 
-        <Row>
-          <Col>
-            <Form.Group>
-              <Button onClick={this.handleGetKeys}>Generate Keys</Button>
-            </Form.Group>
-          </Col>
-        </Row>
+      <Content content={content} handleGetContent={handleGetContent} />
 
-        <Row>
-          <Col>
-            <Form.Group>
-              <Form.Label>Author</Form.Label>
-              <Form.Control value="Jared" />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <Form.Group>
-              <Form.Label>Content</Form.Label>
-              <Form.Control value={this.state.content} />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <Form.Group>
-              <Button onClick={this.handleGetContent}>Fetch Content</Button>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <Form.Group>
-              <Form.Label>Signature</Form.Label>
-              <Form.Control value={this.state.signature} />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <Form.Group>
-              <Button onClick={this.handleSignContent}>Sign</Button>
-            </Form.Group>
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
+      <Signature signature={signature} handleGetSignature={handleSignContent} />
+    </Container>
+  );
 }
