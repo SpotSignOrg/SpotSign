@@ -13,12 +13,12 @@ const initialState = {
   } as Verification,
 };
 
-export type State = typeof initialState;
+export type State = Readonly<typeof initialState>;
 export type SetState = (state: State) => void;
 export type Action = (state: State, setState: SetState) => void;
 
 export const StateContext = React.createContext({
-  state: initialState,
+  state: initialState as State,
   dispatch: (action: Action) => {
     action;
   },
@@ -28,7 +28,7 @@ export const StateProvider: React.FunctionComponent<{ storedState: State }> = ({
   storedState,
   children,
 }) => {
-  const [state, setState] = React.useState({ ...initialState, ...storedState });
+  const [state, setState] = React.useState({ ...initialState, ...storedState } as State);
   const storeState = (state: State) => {
     console.log("Storing state", state);
     browser.storage.local.set(state);
