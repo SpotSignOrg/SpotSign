@@ -1,4 +1,4 @@
-import { Keys } from "addon/signer";
+import { Keys, Verification } from "addon/signer";
 
 export enum MessageTarget {
   BACKGROUND = "background",
@@ -13,6 +13,8 @@ export enum MessageType {
   SEND_KEYS = "sendKeys",
   GET_SIGNATURE = "getSignature",
   SEND_SIGNATURE = "sendSignature",
+  GET_VERIFICATION = "getVerification",
+  SEND_VERIFICATION = "sendVerification",
 }
 
 interface MessageBase {
@@ -24,14 +26,21 @@ export interface MessageGetKeys extends MessageBase {
   type: MessageType.GET_KEYS;
 }
 
-export interface MessageSignContent extends MessageBase {
+export interface MessageGetSignature extends MessageBase {
   type: MessageType.GET_SIGNATURE;
   publicKey: string;
   privateKey: string;
   content: string;
 }
 
-export type MessageToBackground = MessageGetKeys | MessageSignContent;
+export interface MessageGetVerification extends MessageBase {
+  type: MessageType.GET_VERIFICATION;
+  publicKey: string;
+  content: string;
+  signature: string;
+}
+
+export type MessageToBackground = MessageGetKeys | MessageGetSignature | MessageGetVerification;
 
 export interface MessageSendKeys extends MessageBase {
   type: MessageType.SEND_KEYS;
@@ -48,7 +57,16 @@ export interface MessageSendContent extends MessageBase {
   content: string;
 }
 
-export type MessageToPopup = MessageSendKeys | MessageSendSignature | MessageSendContent;
+export interface MessageSendVerification extends MessageBase {
+  type: MessageType.SEND_VERIFICATION;
+  verification: Verification;
+}
+
+export type MessageToPopup =
+  | MessageSendKeys
+  | MessageSendContent
+  | MessageSendSignature
+  | MessageSendVerification;
 
 export interface MessageGetContent extends MessageBase {
   type: MessageType.GET_CONTENT;

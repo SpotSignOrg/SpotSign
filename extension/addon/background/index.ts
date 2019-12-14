@@ -2,7 +2,7 @@ const signerPkg = import("signer/pkg");
 
 import { assertNever } from "addon/lib/never";
 import { MessageTarget, MessageType, MessageToBackground, listen } from "addon/lib/messages";
-import { Keys, Signature } from "addon/signer";
+import { Keys, Signature, Verification } from "addon/signer";
 
 (async () => {
   const signer = await signerPkg;
@@ -24,6 +24,16 @@ import { Keys, Signature } from "addon/signer";
             message.content,
             new Date().toISOString(),
           ) as Signature).signature,
+        };
+      case MessageType.GET_VERIFICATION:
+        return {
+          type: MessageType.SEND_VERIFICATION,
+          sender: MessageTarget.BACKGROUND,
+          verification: signer.verify_message(
+            message.publicKey,
+            message.signature,
+            message.content,
+          ) as Verification,
         };
       default:
         return assertNever(message);

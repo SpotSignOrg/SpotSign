@@ -6,3 +6,9 @@ export interface Keys {
 export interface Signature {
   signature: string;
 }
+
+export interface Verification {
+  verified: boolean;
+  datetime?: string;
+  error?: string;
+}

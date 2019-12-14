@@ -5,9 +5,10 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 
 import { useState } from "addon/popup/state";
+import { getKeys } from "addon/popup/state/actions";
 
 export default function KeyManager() {
-  const { state, getKeys } = useState();
+  const { state, setState } = useState();
   return (
     <React.Fragment>
       <Row>
@@ -31,7 +32,7 @@ export default function KeyManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={getKeys}>Generate Keys</Button>
+            <Button onClick={() => getKeys(state, setState)}>Generate Keys</Button>
           </Form.Group>
         </Col>
       </Row>
