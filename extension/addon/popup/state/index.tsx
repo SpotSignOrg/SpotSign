@@ -4,8 +4,6 @@ import { Verification } from "addon/signer";
 
 const initialState = {
   keys: { privateKey: "No Private Key", publicKey: "No Public Key" },
-  content: "No Content",
-  signature: "No Signature",
   verification: {
     verified: false,
     datetime: "Not verified",

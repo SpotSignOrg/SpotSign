@@ -17,32 +17,40 @@ export const getKeys = async (state: State, setState: SetState) => {
   }
 };
 
-export const getContent = async (state: State, setState: SetState) => {
+const getContent = async () => {
   const responses = await sendToContent({
     type: MessageType.GET_CONTENT,
     sender: MessageTarget.POPUP,
   });
   for (const response of responses) {
     if (response.type === MessageType.SEND_CONTENT) {
-      setState({
-        ...state,
-        content: response.content,
-      });
+      return response.content;
     }
   }
+  return;
 };
 
-export const getSignature = async (state: State, setState: SetState) => {
+export const getSignature = async (state: State) => {
+  const content = await getContent();
+
+  if (!content) {
+    console.log("No content to sign, aborting");
+    return;
+  }
+
   const response = await sendToBackground({
     type: MessageType.GET_SIGNATURE,
     sender: MessageTarget.POPUP,
-    content: state.content,
+    content: content,
     privateKey: state.keys.privateKey,
     publicKey: state.keys.publicKey,
   });
+
   if (response.type === MessageType.SEND_SIGNATURE) {
-    setState({
-      ...state,
+    sendToContent({
+      type: MessageType.WRITE_SIGNATURE,
+      sender: MessageTarget.POPUP,
+      content: content,
       signature: response.signature,
     });
   }
@@ -53,8 +61,8 @@ export const getVerification = async (state: State, setState: SetState) => {
     type: MessageType.GET_VERIFICATION,
     sender: MessageTarget.POPUP,
     publicKey: state.keys.publicKey,
-    content: state.content,
-    signature: state.signature,
+    content: "state.content",
+    signature: "state.signature",
   });
   if (response.type === MessageType.SEND_VERIFICATION) {
     setState({

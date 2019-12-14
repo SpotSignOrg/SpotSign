@@ -15,6 +15,7 @@ export enum MessageType {
   SEND_SIGNATURE = "sendSignature",
   GET_VERIFICATION = "getVerification",
   SEND_VERIFICATION = "sendVerification",
+  WRITE_SIGNATURE = "writeSignature",
 }
 
 interface MessageBase {
@@ -72,7 +73,13 @@ export interface MessageGetContent extends MessageBase {
   type: MessageType.GET_CONTENT;
 }
 
-export type MessageToContent = MessageGetContent;
+export interface MessageWriteSignature extends MessageBase {
+  type: MessageType.WRITE_SIGNATURE;
+  content: string;
+  signature: string;
+}
+
+export type MessageToContent = MessageGetContent | MessageWriteSignature;
 
 export type Message = MessageToBackground | MessageToPopup | MessageToContent;
 
@@ -101,11 +108,13 @@ export function sendToPopup(message: MessageToPopup) {
   return browser.runtime.sendMessage(message);
 }
 
-export function listen(receiver: MessageTarget, listener: (_: Message) => Message) {
+export function listen(receiver: MessageTarget, listener: (_: Message) => Message | void) {
   return browser.runtime.onMessage.addListener((message: Message, _, sendResponse) => {
     console.log(`Received message in ${receiver}:`, message);
     const response = listener(message);
     console.log(`Responded with`, response);
-    sendResponse(response);
+    if (response) {
+      sendResponse(response);
+    }
   });
 }

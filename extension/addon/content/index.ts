@@ -1,4 +1,6 @@
 import { MessageTarget, MessageType, MessageToContent, listen } from "addon/lib/messages";
+import { assertNever } from "addon/lib/never";
+import { toUtf32 } from "addon/lib/encode";
 
 declare global {
   interface Window {
@@ -19,13 +21,24 @@ declare global {
   window.hasRun = true;
 
   function getActiveContent(): string {
-    const element = document.activeElement;
-    console.log("Active element:", element);
     const content =
       (document.activeElement as HTMLInputElement).value ||
       (document.activeElement as HTMLElement).innerText;
     console.log("Found content:", content);
     return content;
+  }
+
+  function setActiveContent(content: string, signature: string) {
+    const element = document.activeElement;
+    const signedContent = `${content}\n\nSignature: ${toUtf32(signature)}`;
+
+    if (!element) return;
+
+    if ((element as HTMLInputElement).value) {
+      (element as HTMLInputElement).value = signedContent;
+    } else {
+      (element as HTMLElement).innerText = signedContent;
+    }
   }
 
   console.log("content listening");
@@ -37,6 +50,10 @@ declare global {
           sender: MessageTarget.CONTENT,
           content: getActiveContent(),
         };
+      case MessageType.WRITE_SIGNATURE:
+        return setActiveContent(message.content, message.signature);
+      default:
+        return assertNever(message);
     }
   });
 })();
