@@ -15,17 +15,19 @@ const initialState = {
 
 export type State = typeof initialState;
 export type SetState = (state: State) => void;
+export type Action = (state: State, setState: SetState) => void;
 
 export const StateContext = React.createContext({
   state: initialState,
-  setState: (state: State) => {
-    state;
+  dispatch: (action: Action) => {
+    action;
   },
 });
 
 export const StateProvider: React.FunctionComponent = ({ children }) => {
   const [state, setState] = React.useState(initialState);
-  return <StateContext.Provider value={{ state, setState }}>{children}</StateContext.Provider>;
+  const dispatch = (action: Action) => action(state, setState);
+  return <StateContext.Provider value={{ state, dispatch }}>{children}</StateContext.Provider>;
 };
 
 export const useState = () => React.useContext(StateContext);

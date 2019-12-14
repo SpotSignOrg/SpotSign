@@ -8,7 +8,7 @@ import { useState } from "addon/popup/state";
 import { getContent } from "addon/popup/state/actions";
 
 export default function ContentManager() {
-  const { state, setState } = useState();
+  const { state, dispatch } = useState();
   return (
     <React.Fragment>
       <Row>
@@ -22,7 +22,7 @@ export default function ContentManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => getContent(state, setState)}>Fetch Content</Button>
+            <Button onClick={() => dispatch(getContent)}>Fetch Content</Button>
           </Form.Group>
         </Col>
       </Row>

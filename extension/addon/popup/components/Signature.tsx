@@ -8,7 +8,7 @@ import { useState } from "addon/popup/state";
 import { getSignature, getVerification } from "addon/popup/state/actions";
 
 export default function SignatureManager() {
-  const { state, setState } = useState();
+  const { state, dispatch } = useState();
 
   return (
     <React.Fragment>
@@ -24,8 +24,8 @@ export default function SignatureManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => getSignature(state, setState)}>Sign Content</Button>
-            <Button onClick={() => getVerification(state, setState)}>Verify Signature</Button>
+            <Button onClick={() => dispatch(getSignature)}>Sign Content</Button>
+            <Button onClick={() => dispatch(getVerification)}>Verify Signature</Button>
           </Form.Group>
         </Col>
       </Row>

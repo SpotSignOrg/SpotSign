@@ -8,7 +8,7 @@ import { useState } from "addon/popup/state";
 import { getKeys } from "addon/popup/state/actions";
 
 export default function KeyManager() {
-  const { state, setState } = useState();
+  const { state, dispatch } = useState();
   return (
     <React.Fragment>
       <Row>
@@ -32,7 +32,7 @@ export default function KeyManager() {
       <Row>
         <Col>
           <Form.Group>
-            <Button onClick={() => getKeys(state, setState)}>Generate Keys</Button>
+            <Button onClick={() => dispatch(getKeys)}>Generate Keys</Button>
           </Form.Group>
         </Col>
       </Row>
