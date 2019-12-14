@@ -10,6 +10,11 @@ import { getSignature, getVerification } from "addon/popup/state/actions";
 export default function SignatureManager() {
   const { state, dispatch } = useState();
 
+  let verificationMsg = <p>Error: {state.verification.error}</p>;
+  if (state.verification.verified) {
+    verificationMsg = <p>Verified: {state.verification.datetime}</p>;
+  }
+
   return (
     <React.Fragment>
       <Row>
@@ -17,7 +22,7 @@ export default function SignatureManager() {
           <Form.Group>
             <Form.Label>Signature</Form.Label>
             <Form.Control readOnly value={state.signature} />
-            <p>Verified: {state.verification.datetime}</p>
+            {verificationMsg}
           </Form.Group>
         </Col>
       </Row>
