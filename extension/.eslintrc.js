@@ -14,14 +14,16 @@ module.exports = {
   },
   ignorePatterns: ["webpack.config.js", "node_modules/", "icons/", "manifest.json", "*.html"],
   rules: {
-    "eslint(@typescript-eslint/camelcase)": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "promise/prefer-await-to-then": "error",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" } ],
+    "eslint(@typescript-eslint/camelcase)": "off",
     "promise/prefer-await-to-callbacks": "error",
-    "react/prop-types": "off",
-    "react-hooks/rules-of-hooks": "error",
+    "promise/prefer-await-to-then": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "@typescript-eslint/no-empty-function": "off"
+    "react-hooks/rules-of-hooks": "error",
+    "react/prop-types": "off",
+
   },
   settings: {
     "react": {

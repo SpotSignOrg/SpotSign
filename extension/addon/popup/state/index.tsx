@@ -24,9 +24,20 @@ export const StateContext = React.createContext({
   },
 });
 
-export const StateProvider: React.FunctionComponent = ({ children }) => {
-  const [state, setState] = React.useState(initialState);
-  const dispatch = (action: Action) => action(state, setState);
+export const StateProvider: React.FunctionComponent<{ storedState: State }> = ({
+  storedState,
+  children,
+}) => {
+  const [state, setState] = React.useState({ ...initialState, ...storedState });
+  const storeState = (state: State) => {
+    console.log("Storing state", state);
+    browser.storage.local.set(state);
+    console.log("Stored state", state);
+    setState(state);
+    console.log("Updated state");
+  };
+  const dispatch = (action: Action) => action(state, storeState);
+
   return <StateContext.Provider value={{ state, dispatch }}>{children}</StateContext.Provider>;
 };
 

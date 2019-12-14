@@ -25,9 +25,19 @@ interface Runtime {
   onMessage: BrowserOnMessage;
 }
 
+interface StorageLocal {
+  get<T>(): Promise<T>;
+  set<T>(data: T): void;
+}
+
+interface Storage {
+  local: StorageLocal;
+}
+
 interface Browser {
   runtime: Runtime;
   tabs: BrowserTabs;
+  storage: Storage;
 }
 
 declare global {
