@@ -1,6 +1,13 @@
-import { MessageTarget, MessageType, MessageToContent, listen } from "addon/lib/messages";
+import {
+  MessageTarget,
+  MessageType,
+  MessageToContent,
+  listen,
+  sendToBackground,
+} from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
-import { toUtf32 } from "addon/lib/encode";
+import { toUtf32, fromUtf32 } from "addon/lib/encode";
+import { State } from "addon/popup/state";
 
 declare global {
   interface Window {
@@ -20,6 +27,60 @@ declare global {
   }
   window.hasRun = true;
 
+  async function findSignatures() {
+    const signatureNodes = [];
+    for (const node of document.querySelectorAll("*")) {
+      if ((node as HTMLElement).innerText.search(/^\[.*\]/) > -1) {
+        const parent = (node as HTMLElement).parentElement;
+        if (parent) {
+          if (parent.innerText.replace(/(\r\n|\n|\r)/gm, " ").search(/^\[.*\].*\{.*\}/) > -1) {
+            signatureNodes.push(parent);
+          }
+        }
+      }
+    }
+
+    console.log(signatureNodes);
+    for (const signatureNode of signatureNodes) {
+      let content: undefined | string;
+      let signature: undefined | string;
+
+      const contentMatches = signatureNode.innerText.match(/^\[(.*)\]/);
+      if (contentMatches) {
+        content = contentMatches[1];
+      }
+
+      const signatureMatches = signatureNode.innerText.match(/\{(.*)\}/);
+      if (signatureMatches) {
+        signature = fromUtf32(signatureMatches[1]);
+      }
+
+      if (content && signature) {
+        console.log("Found content:", content, "signature:", signature);
+        const state: State = await browser.storage.local.get();
+        console.log("state", state);
+        const response = await sendToBackground({
+          type: MessageType.GET_VERIFICATION,
+          sender: MessageTarget.CONTENT,
+          publicKey: state.keys.publicKey,
+          content,
+          signature,
+        });
+        if (response.type === MessageType.SEND_VERIFICATION) {
+          console.log(response);
+          if (response.verification.datetime) {
+            signatureNode.innerText = signatureNode.innerText.replace(
+              /\{.*\}/,
+              response.verification.datetime,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  findSignatures();
+
   function getActiveContent(): string {
     const content =
       (document.activeElement as HTMLInputElement).value ||
@@ -30,7 +91,9 @@ declare global {
 
   function setActiveContent(content: string, signature: string) {
     const element = document.activeElement;
-    const signedContent = `${content}\n\nSignature: ${toUtf32(signature)}`;
+    const signatureBody = `Signature: {${toUtf32(signature)}}`;
+    const urlBody = "Signed by http://spotsign.org";
+    const signedContent = `[${content}]\n\n${signatureBody}\n\n${urlBody}`;
 
     if (!element) return;
 
