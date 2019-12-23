@@ -14,6 +14,8 @@ declare global {
   }
 }
 
+const SIGN_HOST = "http://spotsign.org";
+
 function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
@@ -48,7 +50,7 @@ async function verifySignature(
   if (response.type === MessageType.SEND_VERIFICATION) {
     if (response.verification.datetime) {
       console.log("Verified", content, signature);
-      const verifiedRe = new RegExp(`http:\/\/spotsign.org.*${signature}`, "gm");
+      const verifiedRe = new RegExp(`${escapeRegExp(SIGN_HOST)}.*${signature}`, "gm");
       elem.innerHTML = elem.innerHTML.replace(
         verifiedRe,
         `Verified: ${response.verification.datetime}`,
@@ -61,7 +63,8 @@ async function verifySignature(
 
 async function verifySignatures(state: State) {
   const signaturesRe = new RegExp(
-    /http:\/\/spotsign\.org\/v\/\?a=(.{1})&b=(.{1})&c=(\d+)&s=([a-zA-Z0-9\_\-\=]*)/gm,
+    `${escapeRegExp(SIGN_HOST)}\\/v\\/\\?a=(.{1})&b=(.{1})&c=(\\d+)&s=([a-zA-Z0-9\\_\\-\\=]*)`,
+    "gm",
   );
 
   for (const currElem of document.querySelectorAll("*")) {
@@ -95,7 +98,7 @@ function formatSignature(content: string, signature: string) {
   const a = content[0];
   const b = content[content.length - 1];
   const c = content.length;
-  return `http://spotsign.org/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
+  return `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
 }
 
 function writeActiveSignature(signedContent: string, signature: string) {
