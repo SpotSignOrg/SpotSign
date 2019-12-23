@@ -22,7 +22,7 @@ function stripContent(input: string) {
   return input.replace(/(\r\n|\n|\r)/gm, "").trim();
 }
 
-(function() {
+(async function() {
   /**
    * Check and set a global guard variable.
    * If this content script is injected into the same page again,
@@ -34,74 +34,65 @@ function stripContent(input: string) {
   }
   window.hasRun = true;
 
-  async function findSignatures() {
-    const re = new RegExp(
+  const state: State = await browser.storage.local.get();
+
+  function getContentRegExp(signatureMatch: RegExpMatchArray) {
+    const a = signatureMatch[1];
+    const b = signatureMatch[2];
+    const c = parseInt(signatureMatch[3]);
+    return new RegExp(`${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`, "gm");
+  }
+
+  async function verifySignature(elem: HTMLElement, content: string, signature: string) {
+    const response = await sendToBackground({
+      type: MessageType.GET_VERIFICATION,
+      sender: MessageTarget.CONTENT,
+      publicKey: state.keys.publicKey,
+      content,
+      signature,
+    });
+
+    console.log(response);
+
+    if (response.type === MessageType.SEND_VERIFICATION) {
+      if (response.verification.datetime) {
+        console.log("Verified", content, signature);
+        const verifiedRe = new RegExp(`http:\/\/spotsign.org.*${signature}`, "gm");
+        elem.innerHTML = elem.innerHTML.replace(
+          verifiedRe,
+          `Verified: ${response.verification.datetime}`,
+        );
+      } else {
+        console.log("Failed to verify", content, signature);
+      }
+    }
+  }
+
+  async function verifySignatures() {
+    const signaturesRe = new RegExp(
       /http:\/\/spotsign\.org\/v\/\?a=(.{1})&b=(.{1})&c=(\d+)&s=([a-zA-Z0-9\_\-\=]*)/gm,
     );
 
     for (const currElem of document.querySelectorAll("*")) {
       const elem = currElem as HTMLElement;
-      if (elem.childElementCount > 0) {
-        continue;
-      }
+      if (elem.childElementCount > 0) continue;
 
-      const signatureMatches = Array.from(elem.innerText.matchAll(re));
-
-      if (!signatureMatches.length) {
-        continue;
-      }
-
-      console.log("Found signature", Array.from(signatureMatches), "in", elem);
+      const signatureMatches = Array.from(elem.innerText.matchAll(signaturesRe));
+      if (!signatureMatches.length) continue;
 
       for (const signatureMatch of signatureMatches) {
-        console.log("found match", signatureMatch);
-        const a = signatureMatch[1];
-        const b = signatureMatch[2];
-        const c = parseInt(signatureMatch[3]);
-        const signature = signatureMatch[4];
-        const contentRe = new RegExp(
-          `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
-          "gm",
-        );
-
-        console.log("Searching for", contentRe);
-
-        const contentMatches = document.body.innerText.matchAll(contentRe);
-
+        const contentMatches = document.body.innerText.matchAll(getContentRegExp(signatureMatch));
         for (const contentMatch of contentMatches) {
+          const signature = signatureMatch[4];
           const content = stripContent(contentMatch[0]);
           console.log("Found content:", content, "signature:", signature);
-
-          const state: State = await browser.storage.local.get();
-          console.log("state", state);
-
-          const response = await sendToBackground({
-            type: MessageType.GET_VERIFICATION,
-            sender: MessageTarget.CONTENT,
-            publicKey: state.keys.publicKey,
-            content,
-            signature,
-          });
-          if (response.type === MessageType.SEND_VERIFICATION) {
-            console.log(response);
-            if (response.verification.datetime) {
-              console.log("Verified", content, signature);
-              const verifiedRe = new RegExp(`http:\/\/spotsign.org.*${signature}`, "gm");
-              console.log("Replacing with verifiedre", elem.innerHTML, verifiedRe);
-              elem.innerHTML = elem.innerHTML.replace(
-                verifiedRe,
-                `Verified: ${response.verification.datetime}`,
-              );
-            } else {
-              console.log("Failed to verify", content, signature);
-            }
-          }
+          verifySignature(elem, content, signature);
         }
       }
     }
   }
 
-  findSignatures();
+  verifySignatures();
 
   function getActiveContent() {
     const content =
@@ -118,18 +109,18 @@ function stripContent(input: string) {
     return `http://spotsign.org/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
   }
 
-  function writeActiveSignature(signature: string) {
+  function writeActiveSignature(signedContent: string, signature: string) {
     const element = document.activeElement;
     const content = getActiveContent();
-    const signatureUrl = formatSignature(content, signature);
-    const signedContent = `${content}\n\n${signatureUrl}`;
+    const signatureUrl = formatSignature(signedContent, signature);
+    const contentWithSignature = `${content}\n\n${signatureUrl}`;
 
     if (!element) return;
 
     if ((element as HTMLInputElement).value) {
-      (element as HTMLInputElement).value = signedContent;
+      (element as HTMLInputElement).value = contentWithSignature;
     } else {
-      (element as HTMLElement).innerText = signedContent;
+      (element as HTMLElement).innerText = contentWithSignature;
     }
   }
 
@@ -143,7 +134,7 @@ function stripContent(input: string) {
           content: stripContent(getActiveContent()),
         };
       case MessageType.WRITE_SIGNATURE:
-        return writeActiveSignature(message.signature);
+        return writeActiveSignature(message.content, message.signature);
       default:
         return assertNever(message);
     }
