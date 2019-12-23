@@ -6,13 +6,20 @@ import {
   sendToBackground,
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
-import { toUtf32, fromUtf32 } from "addon/lib/encode";
 import { State } from "addon/popup/state";
 
 declare global {
   interface Window {
     hasRun: boolean;
   }
+}
+
+function escapeRegExp(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
+function stripContent(input: string) {
+  return input.replace(/(\r\n|\n|\r)/gm, "").trim();
 }
 
 (function() {
@@ -28,51 +35,66 @@ declare global {
   window.hasRun = true;
 
   async function findSignatures() {
-    const signatureNodes = [];
-    for (const node of document.querySelectorAll("*")) {
-      if ((node as HTMLElement).innerText.search(/^\[.*\]/) > -1) {
-        const parent = (node as HTMLElement).parentElement;
-        if (parent) {
-          if (parent.innerText.replace(/(\r\n|\n|\r)/gm, " ").search(/^\[.*\].*\{.*\}/) > -1) {
-            signatureNodes.push(parent);
-          }
-        }
-      }
-    }
+    const re = new RegExp(
+      /http:\/\/spotsign\.org\/v\/\?a=(.{1})&b=(.{1})&c=(\d+)&s=([a-zA-Z0-9\_\-\=]*)/gm,
+    );
 
-    console.log(signatureNodes);
-    for (const signatureNode of signatureNodes) {
-      let content: undefined | string;
-      let signature: undefined | string;
-
-      const contentMatches = signatureNode.innerText.match(/^\[(.*)\]/);
-      if (contentMatches) {
-        content = contentMatches[1];
+    for (const currElem of document.querySelectorAll("*")) {
+      const elem = currElem as HTMLElement;
+      if (elem.childElementCount > 0) {
+        continue;
       }
 
-      const signatureMatches = signatureNode.innerText.match(/\{(.*)\}/);
-      if (signatureMatches) {
-        signature = fromUtf32(signatureMatches[1]);
+      const signatureMatches = Array.from(elem.innerText.matchAll(re));
+
+      if (!signatureMatches.length) {
+        continue;
       }
 
-      if (content && signature) {
-        console.log("Found content:", content, "signature:", signature);
-        const state: State = await browser.storage.local.get();
-        console.log("state", state);
-        const response = await sendToBackground({
-          type: MessageType.GET_VERIFICATION,
-          sender: MessageTarget.CONTENT,
-          publicKey: state.keys.publicKey,
-          content,
-          signature,
-        });
-        if (response.type === MessageType.SEND_VERIFICATION) {
-          console.log(response);
-          if (response.verification.datetime) {
-            signatureNode.innerText = signatureNode.innerText.replace(
-              /\{.*\}/,
-              response.verification.datetime,
-            );
+      console.log("Found signature", Array.from(signatureMatches), "in", elem);
+
+      for (const signatureMatch of signatureMatches) {
+        console.log("found match", signatureMatch);
+        const a = signatureMatch[1];
+        const b = signatureMatch[2];
+        const c = parseInt(signatureMatch[3]);
+        const signature = signatureMatch[4];
+        const contentRe = new RegExp(
+          `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
+          "gm",
+        );
+
+        console.log("Searching for", contentRe);
+
+        const contentMatches = document.body.innerText.matchAll(contentRe);
+
+        for (const contentMatch of contentMatches) {
+          const content = stripContent(contentMatch[0]);
+          console.log("Found content:", content, "signature:", signature);
+
+          const state: State = await browser.storage.local.get();
+          console.log("state", state);
+
+          const response = await sendToBackground({
+            type: MessageType.GET_VERIFICATION,
+            sender: MessageTarget.CONTENT,
+            publicKey: state.keys.publicKey,
+            content,
+            signature,
+          });
+          if (response.type === MessageType.SEND_VERIFICATION) {
+            console.log(response);
+            if (response.verification.datetime) {
+              console.log("Verified", content, signature);
+              const verifiedRe = new RegExp(`http:\/\/spotsign.org.*${signature}`, "gm");
+              console.log("Replacing with verifiedre", elem.innerHTML, verifiedRe);
+              elem.innerHTML = elem.innerHTML.replace(
+                verifiedRe,
+                `Verified: ${response.verification.datetime}`,
+              );
+            } else {
+              console.log("Failed to verify", content, signature);
+            }
           }
         }
       }
@@ -81,7 +103,7 @@ declare global {
 
   findSignatures();
 
-  function getActiveContent(): string {
+  function getActiveContent() {
     const content =
       (document.activeElement as HTMLInputElement).value ||
       (document.activeElement as HTMLElement).innerText;
@@ -89,11 +111,18 @@ declare global {
     return content;
   }
 
-  function setActiveContent(content: string, signature: string) {
+  function formatSignature(content: string, signature: string) {
+    const a = content[0];
+    const b = content[content.length - 1];
+    const c = content.length;
+    return `http://spotsign.org/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
+  }
+
+  function writeActiveSignature(signature: string) {
     const element = document.activeElement;
-    const signatureBody = `Signature: {${toUtf32(signature)}}`;
-    const urlBody = "Signed by http://spotsign.org";
-    const signedContent = `[${content}]\n\n${signatureBody}\n\n${urlBody}`;
+    const content = getActiveContent();
+    const signatureUrl = formatSignature(content, signature);
+    const signedContent = `${content}\n\n${signatureUrl}`;
 
     if (!element) return;
 
@@ -111,10 +140,10 @@ declare global {
         return {
           type: MessageType.SEND_CONTENT,
           sender: MessageTarget.CONTENT,
-          content: getActiveContent(),
+          content: stripContent(getActiveContent()),
         };
       case MessageType.WRITE_SIGNATURE:
-        return setActiveContent(message.content, message.signature);
+        return writeActiveSignature(message.signature);
       default:
         return assertNever(message);
     }

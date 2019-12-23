@@ -16,20 +16,12 @@
     "strictNullChecks": true,
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
-    "target": "es6",
+    "target": "ES2020",
     "paths": {
-      "addon/*": [
-        "addon/*"
-      ],
-      "signer/*": [
-        "../signer/*"
-      ],
+      "addon/*": ["addon/*"],
+      "signer/*": ["../signer/*"]
     }
   },
-  "include": [
-    "addon/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["addon/**/*"],
+  "exclude": ["node_modules"]
 }
