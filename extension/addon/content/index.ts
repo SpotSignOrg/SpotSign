@@ -42,14 +42,7 @@ function formatSignature(content: string, signature: string) {
   return `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
 }
 
-async function verifySignature(
-  state: State,
-  elem: HTMLElement,
-  content: string,
-  signature: string,
-  signatureUrl: string,
-) {
-  console.log("Verifying signature");
+async function verifySignature(state: State, content: string, signature: string) {
   const response = await sendToBackground({
     type: MessageType.GET_VERIFICATION,
     sender: MessageTarget.CONTENT,
@@ -58,17 +51,12 @@ async function verifySignature(
     signature,
   });
 
-  console.log(response);
-
   if (response.type === MessageType.SEND_VERIFICATION) {
-    if (response.verification.datetime) {
-      console.log("Verified", content, signature);
-      elem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${response.verification.datetime}</a>`;
-      return true;
+    if (response.verification.verified) {
+      return response.verification;
     }
   }
-  console.log("Failed to verify", content, signature);
-  return false;
+  return;
 }
 
 async function verifySignatures(state: State) {
@@ -88,12 +76,14 @@ async function verifySignatures(state: State) {
       const c = parseInt(signatureMatch[3]);
       const signature = signatureMatch[4];
 
+      let verification;
+
       if (c === 1) {
         const content = a;
-        verifySignature(state, elem, content, signature, signatureUrl);
+        verification = await verifySignature(state, content, signature);
       } else if (c === 2) {
         const content = `${a}${b}`;
-        verifySignature(state, elem, content, signature, signatureUrl);
+        verification = await verifySignature(state, content, signature);
       } else {
         const contentRe = new RegExp(
           `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
@@ -103,11 +93,15 @@ async function verifySignatures(state: State) {
 
         for (const contentMatch of contentMatches) {
           const content = stripContent(contentMatch[0]);
-          const verified = await verifySignature(state, elem, content, signature, signatureUrl);
-          if (verified) {
+          verification = await verifySignature(state, content, signature);
+          if (verification) {
             break;
           }
         }
+      }
+
+      if (verification) {
+        elem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
       }
     }
   }
@@ -117,7 +111,6 @@ function getActiveContent() {
   const content =
     (document.activeElement as HTMLInputElement).value ||
     (document.activeElement as HTMLElement).innerText;
-  console.log("Found content:", content);
   return content;
 }
 
@@ -137,7 +130,6 @@ function writeActiveSignature(signedContent: string, signature: string) {
 }
 
 function setupListener() {
-  console.log("content listening");
   listen(MessageTarget.CONTENT, (message: MessageToContent) => {
     switch (message.type) {
       case MessageType.GET_CONTENT:
