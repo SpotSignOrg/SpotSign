@@ -30,6 +30,7 @@ const SIGNATURES_RE = new RegExp(
   `${escapeRegExp(SIGN_HOST)}\\/v\\/\\?a=(.)&b=(.)&c=(\\d+)&s=([a-zA-Z0-9\\_\\-\\=]*)`,
   "gm",
 );
+console.log(SIGNATURES_RE);
 
 function stripContent(input: string) {
   return input.replace(SPECIAL_CHARACTERS_RE, "").trim();
@@ -59,14 +60,16 @@ async function verifySignature(state: State, content: string, signature: string)
   return;
 }
 
-async function verifySignatures(state: State) {
-  const documentContent = stripContent(document.body.innerText);
+async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
+  const strippedContent = stripContent(documentContent);
 
-  for (const currElem of document.querySelectorAll("*")) {
-    const elem = currElem as HTMLElement;
-    if (elem.childElementCount > 0) continue;
+  for (const node of nodes) {
+    const elem = node as HTMLElement;
+
+    if (elem.childElementCount > 0 || !elem.innerText) continue;
 
     const signatureMatches = Array.from(elem.innerText.matchAll(SIGNATURES_RE));
+
     if (!signatureMatches.length) continue;
 
     for (const signatureMatch of signatureMatches) {
@@ -89,8 +92,7 @@ async function verifySignatures(state: State) {
           `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
           "gm",
         );
-        const contentMatches = documentContent.matchAll(contentRe);
-
+        const contentMatches = Array.from(strippedContent.matchAll(contentRe));
         for (const contentMatch of contentMatches) {
           const content = stripContent(contentMatch[0]);
           verification = await verifySignature(state, content, signature);
@@ -146,6 +148,22 @@ function setupListener() {
   });
 }
 
+function observeDOM(state: State) {
+  const observer = new MutationObserver(mutationsList => {
+    for (const mutation of mutationsList) {
+      for (const node of mutation.addedNodes) {
+        const elements = (node as Element).querySelectorAll("*");
+        if (elements.length) {
+          verifySignatures(state, document.body.innerText, elements);
+        }
+      }
+    }
+  });
+
+  // Start observing the target node for configured mutations
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 (async function() {
   /**
    * Check and set a global guard variable.
@@ -160,6 +178,7 @@ function setupListener() {
 
   const state: State = await browser.storage.local.get();
 
-  verifySignatures(state);
   setupListener();
+  verifySignatures(state, document.body.innerText, document.querySelectorAll("*"));
+  observeDOM(state);
 })();
