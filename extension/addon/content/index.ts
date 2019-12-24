@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const SIGN_HOST = "http://spotsign.org";
+const SIGN_HOST = "https://localhost:8080";
 
 function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -31,12 +31,21 @@ function getContentRegExp(signatureMatch: RegExpMatchArray) {
   return new RegExp(`${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`, "gm");
 }
 
+function formatSignature(content: string, signature: string) {
+  const a = content[0];
+  const b = content[content.length - 1];
+  const c = content.length;
+  return `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
+}
+
 async function verifySignature(
   state: State,
   elem: HTMLElement,
   content: string,
   signature: string,
+  signatureUrl: string,
 ) {
+  console.log("Verifying signature");
   const response = await sendToBackground({
     type: MessageType.GET_VERIFICATION,
     sender: MessageTarget.CONTENT,
@@ -50,15 +59,12 @@ async function verifySignature(
   if (response.type === MessageType.SEND_VERIFICATION) {
     if (response.verification.datetime) {
       console.log("Verified", content, signature);
-      const verifiedRe = new RegExp(`${escapeRegExp(SIGN_HOST)}.*${signature}`, "gm");
-      elem.innerHTML = elem.innerHTML.replace(
-        verifiedRe,
-        `Verified: ${response.verification.datetime}`,
-      );
-    } else {
-      console.log("Failed to verify", content, signature);
+      elem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${response.verification.datetime}</a>`;
+      return true;
     }
   }
+  console.log("Failed to verify", content, signature);
+  return false;
 }
 
 async function verifySignatures(state: State) {
@@ -75,12 +81,14 @@ async function verifySignatures(state: State) {
     if (!signatureMatches.length) continue;
 
     for (const signatureMatch of signatureMatches) {
+      const signatureUrl = signatureMatch[0];
       const contentMatches = document.body.innerText.matchAll(getContentRegExp(signatureMatch));
       for (const contentMatch of contentMatches) {
         const signature = signatureMatch[4];
         const content = stripContent(contentMatch[0]);
         console.log("Found content:", content, "signature:", signature);
-        verifySignature(state, elem, content, signature);
+        console.log("Verifying elem", elem);
+        if (verifySignature(state, elem, content, signature, signatureUrl)) break;
       }
     }
   }
@@ -92,13 +100,6 @@ function getActiveContent() {
     (document.activeElement as HTMLElement).innerText;
   console.log("Found content:", content);
   return content;
-}
-
-function formatSignature(content: string, signature: string) {
-  const a = content[0];
-  const b = content[content.length - 1];
-  const c = content.length;
-  return `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
 }
 
 function writeActiveSignature(signedContent: string, signature: string) {
