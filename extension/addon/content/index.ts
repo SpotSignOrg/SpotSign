@@ -14,21 +14,25 @@ declare global {
   }
 }
 
-const SIGN_HOST = "https://localhost:8080";
-
 function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
-function stripContent(input: string) {
-  return input.replace(/(\r\n|\n|\r)/gm, "").trim();
-}
+const SIGN_HOST = "https://localhost:8080";
+const SPECIAL_CHARACTERS = "\r\n !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~";
+const SPECIAL_CHARACTERS_RE = new RegExp(
+  SPECIAL_CHARACTERS.split("")
+    .map(e => `\\${e}`)
+    .join("|"),
+  "gm",
+);
+const SIGNATURES_RE = new RegExp(
+  `${escapeRegExp(SIGN_HOST)}\\/v\\/\\?a=(.)&b=(.)&c=(\\d+)&s=([a-zA-Z0-9\\_\\-\\=]*)`,
+  "gm",
+);
 
-function getContentRegExp(signatureMatch: RegExpMatchArray) {
-  const a = signatureMatch[1];
-  const b = signatureMatch[2];
-  const c = parseInt(signatureMatch[3]);
-  return new RegExp(`${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`, "gm");
+function stripContent(input: string) {
+  return input.replace(SPECIAL_CHARACTERS_RE, "").trim();
 }
 
 function formatSignature(content: string, signature: string) {
@@ -68,27 +72,40 @@ async function verifySignature(
 }
 
 async function verifySignatures(state: State) {
-  const signaturesRe = new RegExp(
-    `${escapeRegExp(SIGN_HOST)}\\/v\\/\\?a=(.{1})&b=(.{1})&c=(\\d+)&s=([a-zA-Z0-9\\_\\-\\=]*)`,
-    "gm",
-  );
-
   for (const currElem of document.querySelectorAll("*")) {
     const elem = currElem as HTMLElement;
     if (elem.childElementCount > 0) continue;
 
-    const signatureMatches = Array.from(elem.innerText.matchAll(signaturesRe));
+    const signatureMatches = Array.from(elem.innerText.matchAll(SIGNATURES_RE));
     if (!signatureMatches.length) continue;
 
     for (const signatureMatch of signatureMatches) {
       const signatureUrl = signatureMatch[0];
-      const contentMatches = document.body.innerText.matchAll(getContentRegExp(signatureMatch));
-      for (const contentMatch of contentMatches) {
-        const signature = signatureMatch[4];
-        const content = stripContent(contentMatch[0]);
-        console.log("Found content:", content, "signature:", signature);
-        console.log("Verifying elem", elem);
-        if (verifySignature(state, elem, content, signature, signatureUrl)) break;
+      const a = signatureMatch[1];
+      const b = signatureMatch[2];
+      const c = parseInt(signatureMatch[3]);
+      const signature = signatureMatch[4];
+
+      if (c === 1) {
+        const content = a;
+        verifySignature(state, elem, content, signature, signatureUrl);
+      } else if (c === 2) {
+        const content = `${a}${b}`;
+        verifySignature(state, elem, content, signature, signatureUrl);
+      } else {
+        const contentRe = new RegExp(
+          `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
+          "gm",
+        );
+        const contentMatches = stripContent(document.body.innerText).matchAll(contentRe);
+
+        for (const contentMatch of contentMatches) {
+          const content = stripContent(contentMatch[0]);
+          const verified = await verifySignature(state, elem, content, signature, signatureUrl);
+          if (verified) {
+            break;
+          }
+        }
       }
     }
   }
