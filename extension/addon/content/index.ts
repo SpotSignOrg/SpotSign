@@ -72,6 +72,8 @@ async function verifySignature(
 }
 
 async function verifySignatures(state: State) {
+  const documentContent = stripContent(document.body.innerText);
+
   for (const currElem of document.querySelectorAll("*")) {
     const elem = currElem as HTMLElement;
     if (elem.childElementCount > 0) continue;
@@ -97,7 +99,7 @@ async function verifySignatures(state: State) {
           `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
           "gm",
         );
-        const contentMatches = stripContent(document.body.innerText).matchAll(contentRe);
+        const contentMatches = documentContent.matchAll(contentRe);
 
         for (const contentMatch of contentMatches) {
           const content = stripContent(contentMatch[0]);
