@@ -18,7 +18,7 @@ function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
-const SIGN_HOST = "https://localhost:8080";
+const SIGN_HOST = "https://spotsign.org";
 const SPECIAL_CHARACTERS = "\r\n !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~";
 const SPECIAL_CHARACTERS_RE = new RegExp(
   SPECIAL_CHARACTERS.split("")
@@ -30,7 +30,6 @@ const SIGNATURES_RE = new RegExp(
   `${escapeRegExp(SIGN_HOST)}\\/v\\/\\?a=(.)&b=(.)&c=(\\d+)&s=([a-zA-Z0-9\\_\\-\\=]*)`,
   "gm",
 );
-console.log(SIGNATURES_RE);
 
 function stripContent(input: string) {
   return input.replace(SPECIAL_CHARACTERS_RE, "").trim();
@@ -66,7 +65,7 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
   for (const node of nodes) {
     const elem = node as HTMLElement;
 
-    if (elem.childElementCount > 0 || !elem.innerText) continue;
+    if (!elem || elem.childElementCount > 0 || !elem.innerText) continue;
 
     const signatureMatches = Array.from(elem.innerText.matchAll(SIGNATURES_RE));
 
