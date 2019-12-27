@@ -62,14 +62,27 @@ async function verifySignature(state: State, content: string, signature: string)
 async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
   const strippedContent = stripContent(documentContent);
 
+  const signatureElems = new Map<string, HTMLElement>();
+
   for (const node of nodes) {
     const elem = node as HTMLElement;
-
-    if (!elem || elem.childElementCount > 0 || !elem.innerText) continue;
+    if (!elem || !elem.innerText) continue;
 
     const signatureMatches = Array.from(elem.innerText.matchAll(SIGNATURES_RE));
-
     if (!signatureMatches.length) continue;
+
+    for (const signatureMatch of signatureMatches) {
+      const signature = signatureMatch[4];
+      const existingSignature = signatureElems.get(signature);
+
+      if (existingSignature && !existingSignature.contains(elem)) continue;
+
+      signatureElems.set(signature, elem);
+    }
+  }
+
+  for (const signatureElem of signatureElems.values()) {
+    const signatureMatches = Array.from(signatureElem.innerText.matchAll(SIGNATURES_RE));
 
     for (const signatureMatch of signatureMatches) {
       const signatureUrl = signatureMatch[0];
@@ -77,7 +90,6 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
       const b = signatureMatch[2];
       const c = parseInt(signatureMatch[3]);
       const signature = signatureMatch[4];
-
       let verification;
 
       if (c === 1) {
@@ -102,7 +114,7 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
       }
 
       if (verification) {
-        elem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
+        signatureElem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
       }
     }
   }
