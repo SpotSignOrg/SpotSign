@@ -108,7 +108,6 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
           "gm",
         );
         const contentMatches = Array.from(strippedContent.matchAll(contentRe));
-        console.log(contentMatches);
         for (const contentMatch of contentMatches) {
           const content = contentMatch[1];
           verification = await verifySignature(state, content, signature);
