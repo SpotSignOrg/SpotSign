@@ -59,30 +59,34 @@ async function verifySignature(state: State, content: string, signature: string)
   return;
 }
 
-async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
-  const strippedContent = stripContent(documentContent);
-
-  const signatureElems = new Map<string, HTMLElement>();
+function findSignatureElements(nodes: NodeList) {
+  const signatureElements = new Map<string, HTMLElement>();
 
   for (const node of nodes) {
-    const elem = node as HTMLElement;
-    if (!elem || !elem.innerText) continue;
+    const element = node as HTMLElement;
+    if (!element || !element.innerText) continue;
 
-    const signatureMatches = Array.from(elem.innerText.matchAll(SIGNATURES_RE));
+    const signatureMatches = Array.from(element.innerText.matchAll(SIGNATURES_RE));
     if (!signatureMatches.length) continue;
 
     for (const signatureMatch of signatureMatches) {
       const signature = signatureMatch[4];
-      const existingSignature = signatureElems.get(signature);
+      const existingElement = signatureElements.get(signature);
 
-      if (existingSignature && !existingSignature.contains(elem)) continue;
+      if (existingElement && !existingElement.contains(element)) continue;
 
-      signatureElems.set(signature, elem);
+      signatureElements.set(signature, element);
     }
   }
+  return signatureElements;
+}
 
-  for (const signatureElem of signatureElems.values()) {
-    const signatureMatches = Array.from(signatureElem.innerText.matchAll(SIGNATURES_RE));
+async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
+  const signatureElements = findSignatureElements(nodes);
+  const strippedContent = stripContent(documentContent);
+
+  for (const signatureElement of signatureElements.values()) {
+    const signatureMatches = signatureElement.innerText.matchAll(SIGNATURES_RE);
 
     for (const signatureMatch of signatureMatches) {
       const signatureUrl = signatureMatch[0];
@@ -100,21 +104,22 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
         verification = await verifySignature(state, content, signature);
       } else {
         const contentRe = new RegExp(
-          `${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}`,
+          `(?=(${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}))`,
           "gm",
         );
         const contentMatches = Array.from(strippedContent.matchAll(contentRe));
+        console.log(contentMatches);
         for (const contentMatch of contentMatches) {
-          const content = stripContent(contentMatch[0]);
+          const content = contentMatch[1];
           verification = await verifySignature(state, content, signature);
-          if (verification) {
+          if (verification && verification.verified) {
             break;
           }
         }
       }
 
       if (verification) {
-        signatureElem.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
+        signatureElement.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
       }
     }
   }
