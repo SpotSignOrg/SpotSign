@@ -37,13 +37,6 @@ declare global {
     return content.replace(SPECIAL_CHARACTERS_RE, "").trim();
   }
 
-  function formatSignature(content: string, signature: string) {
-    const a = content[0];
-    const b = content[content.length - 1];
-    const c = content.length;
-    return `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
-  }
-
   async function verifySignature(state: State, content: string, signature: string) {
     const response = await sendToBackground({
       type: MessageType.GET_VERIFICATION,
@@ -63,6 +56,7 @@ declare global {
 
   function findSignatureElements(nodes: NodeList) {
     const signatureElements = new Map<string, HTMLElement>();
+
     for (const node of nodes) {
       const element = node as HTMLElement;
 
@@ -118,7 +112,7 @@ declare global {
         }
 
         if (verification && verification.datetime) {
-          signatureElement.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${new Date(
+          signatureElement.innerHTML = `<a href=${signatureUrl}>✅ Signed by Jared on ${new Date(
             verification.datetime,
           ).toLocaleString("en-US")}</a>`;
         }
@@ -161,6 +155,30 @@ declare global {
     return contentElement;
   }
 
+  function formatMarkdown(signatureUrl: string) {
+    const markdownDomains = ["reddit.com", "github.com"];
+
+    let hasMarkdown = false;
+    for (const markdownDomain of markdownDomains) {
+      if (window.location.host.search(markdownDomain) > -1) {
+        hasMarkdown = true;
+      }
+    }
+
+    if (hasMarkdown) {
+      return `[Verify Signature](${signatureUrl})`;
+    }
+    return signatureUrl;
+  }
+
+  function formatSignature(content: string, signature: string) {
+    const a = content[0];
+    const b = content[content.length - 1];
+    const c = content.length;
+    const url = `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
+    return `\n\n${formatMarkdown(url)}`;
+  }
+
   function writeActiveSignature(signedContent: string, signature: string) {
     const activeElement = document.activeElement;
     if (!activeElement) return;
@@ -172,9 +190,9 @@ declare global {
     const signatureUrl = formatSignature(signedContent, signature);
 
     if ((contentElement as HTMLInputElement).value) {
-      (contentElement as HTMLInputElement).value += `\n\n${signatureUrl}`;
+      (contentElement as HTMLInputElement).value += signatureUrl;
     } else {
-      contentElement.textContent += `\n\n${signatureUrl}`;
+      contentElement.textContent += signatureUrl;
       activeElement.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
