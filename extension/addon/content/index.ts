@@ -117,8 +117,10 @@ async function verifySignatures(state: State, documentContent: string, nodes: No
         }
       }
 
-      if (verification) {
-        signatureElement.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${verification.datetime}</a>`;
+      if (verification && verification.datetime) {
+        signatureElement.innerHTML = `<a href=${signatureUrl}>Signed by Jared on ${new Date(
+          verification.datetime,
+        ).toLocaleString("en-US")}</a>`;
       }
     }
   }
@@ -131,18 +133,58 @@ function getActiveContent() {
   return content;
 }
 
+function findContentElement(parent: HTMLElement, content: string) {
+  const reverse = (str: string) =>
+    str
+      .split("")
+      .reverse()
+      .join("");
+
+  if (!parent.childElementCount) return parent;
+
+  const reversedContent = reverse(content);
+
+  let contentElement;
+  for (const node of parent.querySelectorAll("*")) {
+    const element = node as HTMLElement;
+    if (element.textContent) {
+      const reversedElementContent = reverse(element.textContent);
+
+      if (reversedElementContent && reversedContent.search(reversedElementContent) === 0) {
+        if (contentElement && !contentElement.contains(element)) continue;
+
+        contentElement = element;
+      }
+    }
+  }
+
+  return contentElement;
+}
+
 function writeActiveSignature(signedContent: string, signature: string) {
-  const element = document.activeElement;
+  const activeElement = document.activeElement;
+  if (!activeElement) return;
+
   const content = getActiveContent();
-  const signatureUrl = formatSignature(signedContent, signature);
-  const contentWithSignature = `${content}\n\n${signatureUrl}`;
 
-  if (!element) return;
+  let contentElement = activeElement;
 
-  if ((element as HTMLInputElement).value) {
-    (element as HTMLInputElement).value = contentWithSignature;
+  if (activeElement.childElementCount) {
+    const childElement = findContentElement(activeElement as HTMLElement, content);
+    if (childElement) {
+      contentElement = childElement;
+    }
+  }
+
+  if (!contentElement) return;
+
+  const signatureUrl = `\n\n${formatSignature(signedContent, signature)}`;
+
+  if ((contentElement as HTMLInputElement).value) {
+    (contentElement as HTMLInputElement).value += signatureUrl;
   } else {
-    (element as HTMLElement).innerText = contentWithSignature;
+    contentElement.textContent += signatureUrl;
+    activeElement.dispatchEvent(new Event("input", { bubbles: true }));
   }
 }
 
