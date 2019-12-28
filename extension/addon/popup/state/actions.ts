@@ -47,12 +47,13 @@ export const getSignature = async (state: State) => {
   });
 
   if (response.type === MessageType.SEND_SIGNATURE) {
-    sendToContent({
+    await sendToContent({
       type: MessageType.WRITE_SIGNATURE,
       sender: MessageTarget.POPUP,
       content: content,
       signature: response.signature,
     });
+    window.close();
   }
 };
 

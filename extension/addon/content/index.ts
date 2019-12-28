@@ -33,8 +33,8 @@ declare global {
     "gm",
   );
 
-  function stripContent(input: string) {
-    return input.replace(SPECIAL_CHARACTERS_RE, "").trim();
+  function stripContent(content: string) {
+    return content.replace(SPECIAL_CHARACTERS_RE, "").trim();
   }
 
   function formatSignature(content: string, signature: string) {
@@ -127,10 +127,10 @@ declare global {
   }
 
   function getActiveContent() {
-    const content =
+    return (
       (document.activeElement as HTMLInputElement).value ||
-      (document.activeElement as HTMLElement).innerText;
-    return content;
+      (document.activeElement as HTMLElement).innerText
+    );
   }
 
   function findContentElement(parent: HTMLElement, content: string) {
@@ -144,7 +144,7 @@ declare global {
 
     const reversedContent = reverse(content);
 
-    let contentElement;
+    let contentElement = parent;
     for (const node of parent.querySelectorAll("*")) {
       const element = node as HTMLElement;
       if (element.textContent) {
@@ -167,23 +167,14 @@ declare global {
 
     const content = getActiveContent();
 
-    let contentElement = activeElement;
+    const contentElement = findContentElement(activeElement as HTMLElement, content);
 
-    if (activeElement.childElementCount) {
-      const childElement = findContentElement(activeElement as HTMLElement, content);
-      if (childElement) {
-        contentElement = childElement;
-      }
-    }
-
-    if (!contentElement) return;
-
-    const signatureUrl = `\n\n${formatSignature(signedContent, signature)}`;
+    const signatureUrl = formatSignature(signedContent, signature);
 
     if ((contentElement as HTMLInputElement).value) {
-      (contentElement as HTMLInputElement).value += signatureUrl;
+      (contentElement as HTMLInputElement).value += `\n\n${signatureUrl}`;
     } else {
-      contentElement.textContent += signatureUrl;
+      contentElement.textContent += `\n\n${signatureUrl}`;
       activeElement.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
