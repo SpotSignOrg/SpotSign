@@ -55,35 +55,42 @@ declare global {
   }
 
   function findSignatureElements(nodes: NodeList) {
-    const signatureElements = new Map<string, HTMLElement>();
+    const signaturesElements = new Map<string, Set<HTMLElement>>();
 
     for (const node of nodes) {
       const element = node as HTMLElement;
 
       const signatureMatches = Array.from(unescape(element.outerHTML).matchAll(SIGNATURES_RE));
-      if (!signatureMatches.length) continue;
 
       for (const signatureMatch of signatureMatches) {
-        const signature = unescape(signatureMatch[4]);
-        const existingElement = signatureElements.get(signature);
+        const signatureUrl = unescape(signatureMatch[0]);
+        let existingElements = signaturesElements.get(signatureUrl);
 
-        if (existingElement && !existingElement.contains(element)) continue;
+        if (!existingElements) {
+          existingElements = new Set();
+          signaturesElements.set(signatureUrl, existingElements);
+        }
 
-        signatureElements.set(signature, element);
+        existingElements.add(element);
+
+        for (const existingElement of existingElements) {
+          if (existingElement.contains(element) && element !== existingElement) {
+            existingElements.delete(existingElement);
+          }
+        }
       }
     }
-    return signatureElements;
+    return signaturesElements;
   }
 
   async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
-    const signatureElements = findSignatureElements(nodes);
+    const signaturesElements = findSignatureElements(nodes);
     const strippedContent = stripContent(documentContent);
 
-    for (const signatureElement of signatureElements.values()) {
-      const signatureMatches = unescape(signatureElement.outerHTML).matchAll(SIGNATURES_RE);
+    for (const [signatureUrl, signatureElements] of signaturesElements.entries()) {
+      const signatureMatches = signatureUrl.matchAll(SIGNATURES_RE);
 
       for (const signatureMatch of signatureMatches) {
-        const signatureUrl = signatureMatch[0];
         const a = signatureMatch[1];
         const b = signatureMatch[2];
         const c = parseInt(signatureMatch[3]);
@@ -112,9 +119,11 @@ declare global {
         }
 
         if (verification && verification.datetime) {
-          signatureElement.innerHTML = `<a href=${signatureUrl}>✅ Signed by Jared on ${new Date(
-            verification.datetime,
-          ).toLocaleString("en-US")}</a>`;
+          for (const signatureElement of signatureElements) {
+            signatureElement.innerHTML = `<a href=${signatureUrl}>✅ Signed by Jared on ${new Date(
+              verification.datetime,
+            ).toLocaleString("en-US")}</a>`;
+          }
         }
       }
     }
