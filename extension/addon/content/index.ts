@@ -3,7 +3,7 @@ import {
   MessageType,
   MessageToContent,
   listen,
-  sendToBackground,
+  // sendToBackground,
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
 import { State } from "addon/popup/state";
@@ -38,20 +38,21 @@ declare global {
   }
 
   async function verifySignature(state: State, content: string, signature: string) {
-    const response = await sendToBackground({
-      type: MessageType.GET_VERIFICATION,
-      sender: MessageTarget.CONTENT,
-      publicKey: state.keys.publicKey,
-      content,
-      signature,
-    });
+    console.log(state, content, signature);
+    // const response = await sendToBackground({
+    //   type: MessageType.GET_VERIFICATION,
+    //   sender: MessageTarget.CONTENT,
+    //   publicKey: state.keys.publicKey,
+    //   content,
+    //   signature,
+    // });
 
-    if (response.type === MessageType.SEND_VERIFICATION) {
-      if (response.verification.verified) {
-        return response.verification;
-      }
-    }
-    return;
+    // if (response.type === MessageType.SEND_VERIFICATION) {
+    //   if (response.verification.verified) {
+    //     return response.verification;
+    //   }
+    // }
+    return { verified: false, datetime: "" };
   }
 
   function findSignatureElements(nodes: NodeList) {
