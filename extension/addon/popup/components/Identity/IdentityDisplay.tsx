@@ -1,12 +1,17 @@
 import * as React from "react";
+import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Collapse from "react-bootstrap/Collapse";
-import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 
 import { Identity } from "addon/popup/state";
+import { IdentityKeys } from "addon/popup/components/Identity/IdentityKeys";
+import { signContent } from "addon/popup/state/actions";
+import { useState } from "addon/popup/state";
 
 export const IdentityDisplay: React.FunctionComponent<{ identity: Identity }> = ({ identity }) => {
+  const { dispatch } = useState();
+
   const [open, setOpen] = React.useState(false);
   const ariaId = `${identity.publicKey}-collapse`;
 
@@ -26,21 +31,10 @@ export const IdentityDisplay: React.FunctionComponent<{ identity: Identity }> = 
       </Row>
       <Collapse in={open}>
         <div id={ariaId}>
+          <IdentityKeys identity={identity} />
           <Row>
-            <Col>
-              <Form.Group>
-                <Form.Label>Private Key</Form.Label>
-                <Form.Control readOnly value={identity.privateKey} />
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <Form.Group>
-                <Form.Label>Public Key</Form.Label>
-                <Form.Control readOnly value={identity.publicKey} />
-              </Form.Group>
+            <Col className="text-right">
+              <Button onClick={() => dispatch(signContent(identity))}>Sign</Button>
             </Col>
           </Row>
         </div>

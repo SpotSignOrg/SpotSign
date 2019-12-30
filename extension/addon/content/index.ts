@@ -3,7 +3,7 @@ import {
   MessageType,
   MessageToContent,
   listen,
-  // sendToBackground,
+  sendToBackground,
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
 import { State } from "addon/popup/state";
@@ -26,10 +26,12 @@ declare global {
       .join("|"),
     "gm",
   );
+  const BASE64_RE = "[a-zA-Z0-9\\_\\-%]*";
+  const AMP_RE = "&(?:amp;)?";
   const SIGNATURES_RE = new RegExp(
     `${escapeRegExp(
       SIGN_HOST,
-    )}\\/v\\/\\?a=(.)&(?:amp;)?b=(.)&(?:amp;)?c=(\\d+)&(?:amp;)?s=([a-zA-Z0-9\\_\\-\\=%]*)`,
+    )}\\/v\\/\\?a=(.)${AMP_RE}b=(.)${AMP_RE}c=(\\d+)${AMP_RE}s=(${BASE64_RE})${AMP_RE}k=(${BASE64_RE})`,
     "gm",
   );
 
@@ -37,22 +39,49 @@ declare global {
     return content.replace(SPECIAL_CHARACTERS_RE, "").trim();
   }
 
-  async function verifySignature(state: State, content: string, signature: string) {
-    console.log(state, content, signature);
-    // const response = await sendToBackground({
-    //   type: MessageType.GET_VERIFICATION,
-    //   sender: MessageTarget.CONTENT,
-    //   publicKey: state.keys.publicKey,
-    //   content,
-    //   signature,
-    // });
+  function getAuthor(state: State, publicKey: string) {
+    for (const identity of state.identities) {
+      if (identity.publicKey === publicKey) return identity.name;
+    }
+    return;
+  }
 
-    // if (response.type === MessageType.SEND_VERIFICATION) {
-    //   if (response.verification.verified) {
-    //     return response.verification;
-    //   }
-    // }
-    return { verified: false, datetime: "" };
+  async function verifySignature(
+    state: State,
+    content: string,
+    signature: string,
+    publicKey: string,
+  ) {
+    const response = await sendToBackground({
+      type: MessageType.GET_VERIFICATION,
+      sender: MessageTarget.CONTENT,
+      publicKey: publicKey,
+      content,
+      signature,
+    });
+
+    const verification = {
+      verified: false,
+      datetime: "",
+      author: "",
+    };
+
+    if (response.type === MessageType.SEND_VERIFICATION) {
+      if (response.verification.verified) {
+        verification.verified = response.verification.verified;
+
+        if (response.verification.datetime) {
+          verification.datetime = response.verification.datetime;
+        }
+
+        const author = getAuthor(state, publicKey);
+
+        if (author) {
+          verification.author = author;
+        }
+      }
+    }
+    return verification;
   }
 
   function findSignatureElements(nodes: NodeList) {
@@ -61,10 +90,9 @@ declare global {
     for (const node of nodes) {
       const element = node as HTMLElement;
 
-      const signatureMatches = Array.from(unescape(element.outerHTML).matchAll(SIGNATURES_RE));
-
+      const signatureMatches = Array.from(element.outerHTML.matchAll(SIGNATURES_RE));
       for (const signatureMatch of signatureMatches) {
-        const signatureUrl = unescape(signatureMatch[0]);
+        const signatureUrl = signatureMatch[0];
         let existingElements = signaturesElements.get(signatureUrl);
 
         if (!existingElements) {
@@ -89,21 +117,22 @@ declare global {
     const strippedContent = stripContent(documentContent);
 
     for (const [signatureUrl, signatureElements] of signaturesElements.entries()) {
-      const signatureMatches = signatureUrl.matchAll(SIGNATURES_RE);
+      const signatureMatches = Array.from(signatureUrl.matchAll(SIGNATURES_RE));
 
       for (const signatureMatch of signatureMatches) {
         const a = signatureMatch[1];
         const b = signatureMatch[2];
         const c = parseInt(signatureMatch[3]);
         const signature = unescape(signatureMatch[4]);
+        const publicKey = unescape(signatureMatch[5]);
         let verification;
 
         if (c === 1) {
           const content = a;
-          verification = await verifySignature(state, content, signature);
+          verification = await verifySignature(state, content, signature, publicKey);
         } else if (c === 2) {
           const content = `${a}${b}`;
-          verification = await verifySignature(state, content, signature);
+          verification = await verifySignature(state, content, signature, publicKey);
         } else {
           const contentRe = new RegExp(
             `(?=(${escapeRegExp(a)}[\\s\\S]{${c - 2}}${escapeRegExp(b)}))`,
@@ -112,18 +141,18 @@ declare global {
           const contentMatches = Array.from(strippedContent.matchAll(contentRe));
           for (const contentMatch of contentMatches) {
             const content = contentMatch[1];
-            verification = await verifySignature(state, content, signature);
+            verification = await verifySignature(state, content, signature, publicKey);
             if (verification && verification.verified) {
               break;
             }
           }
         }
 
-        if (verification && verification.datetime) {
+        if (verification && verification.datetime && verification.author) {
           for (const signatureElement of signatureElements) {
-            signatureElement.innerHTML = `<a href=${signatureUrl}>✅ Signed by Jared on ${new Date(
-              verification.datetime,
-            ).toLocaleString("en-US")}</a>`;
+            signatureElement.innerHTML = `<a href=${signatureUrl}>✅ Signed by ${
+              verification.author
+            } on ${new Date(verification.datetime).toLocaleString("en-US")}</a>`;
           }
         }
       }
@@ -181,15 +210,17 @@ declare global {
     return signatureUrl;
   }
 
-  function formatSignature(content: string, signature: string) {
+  function formatSignature(content: string, signature: string, publicKey: string) {
     const a = content[0];
     const b = content[content.length - 1];
     const c = content.length;
-    const url = `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${signature}`;
+    const s = encodeURIComponent(signature);
+    const k = encodeURIComponent(publicKey);
+    const url = `${SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${s}&k=${k}`;
     return `\n\n${formatMarkdown(url)}`;
   }
 
-  function writeActiveSignature(signedContent: string, signature: string) {
+  function writeActiveSignature(signedContent: string, signature: string, publicKey: string) {
     const activeElement = document.activeElement;
     if (!activeElement) return;
 
@@ -197,7 +228,7 @@ declare global {
 
     const contentElement = findContentElement(activeElement as HTMLElement, content);
 
-    const signatureUrl = formatSignature(signedContent, signature);
+    const signatureUrl = formatSignature(signedContent, signature, publicKey);
 
     if ((contentElement as HTMLInputElement).value) {
       (contentElement as HTMLInputElement).value += signatureUrl;
@@ -217,7 +248,7 @@ declare global {
             content: stripContent(getActiveContent()),
           };
         case MessageType.WRITE_SIGNATURE:
-          return writeActiveSignature(message.content, message.signature);
+          return writeActiveSignature(message.content, message.signature, message.publicKey);
         default:
           return assertNever(message);
       }
@@ -228,7 +259,7 @@ declare global {
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
         for (const node of mutation.addedNodes) {
-          const elements = (node as Element).querySelectorAll("*");
+          const elements = (node as Element).querySelectorAll("a");
           if (elements.length) {
             verifySignatures(state, document.body.innerText, elements);
           }
@@ -254,6 +285,6 @@ declare global {
   const state: State = await browser.storage.local.get();
 
   setupListener();
-  verifySignatures(state, document.body.innerText, document.querySelectorAll("*"));
+  verifySignatures(state, document.body.innerText, document.querySelectorAll("a"));
   observeDOM(state);
 })().catch(console.error);

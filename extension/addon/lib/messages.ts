@@ -77,6 +77,7 @@ export interface MessageWriteSignature extends MessageBase {
   type: MessageType.WRITE_SIGNATURE;
   content: string;
   signature: string;
+  publicKey: string;
 }
 
 export type MessageToContent = MessageGetContent | MessageWriteSignature;
