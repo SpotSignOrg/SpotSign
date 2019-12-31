@@ -4,7 +4,9 @@ import * as Immutable from "immutable";
 export interface IdentityProps {
   readonly edit: boolean;
   readonly name: string;
+  readonly password: string;
   readonly publicKey: string;
+  readonly privateKey: string;
 }
 
 export interface Identity extends Immutable.RecordOf<IdentityProps>, IdentityProps {}
@@ -12,7 +14,9 @@ export interface Identity extends Immutable.RecordOf<IdentityProps>, IdentityPro
 export const MakeIdentity = Immutable.Record<IdentityProps>({
   edit: true,
   name: "No Name",
+  password: "No Password",
   publicKey: "No Public Key",
+  privateKey: "No Private Key",
 });
 
 export interface StateProps {

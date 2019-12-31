@@ -30,6 +30,7 @@ export interface MessageGetKeys extends MessageBase {
 export interface MessageSignContent extends MessageBase {
   type: MessageType.SIGN_CONTENT;
   publicKey: string;
+  privateKey: string;
 }
 
 export interface MessageGetVerification extends MessageBase {
@@ -44,6 +45,7 @@ export type MessageToBackground = MessageGetKeys | MessageSignContent | MessageG
 export interface MessageSendKeys extends MessageBase {
   type: MessageType.SEND_KEYS;
   publicKey: string;
+  privateKey: string;
 }
 
 export interface MessageContentSignedSuccess extends MessageBase {

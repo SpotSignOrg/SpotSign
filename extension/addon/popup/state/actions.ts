@@ -13,6 +13,7 @@ export const createIdentity = () => async (state: State, setState: SetState) => 
       MakeIdentity({
         name: "New Identity",
         publicKey: response.publicKey,
+        privateKey: response.privateKey,
       }),
     );
     setState(state.set("identities", newIdentities));
@@ -23,7 +24,10 @@ export const saveIdentity = (identity: Identity, newName: string, newPassword: s
   state: State,
   setState: SetState,
 ) => {
-  const newIdentity = identity.set("name", newName).set("edit", false);
+  const newIdentity = identity
+    .set("name", newName)
+    .set("edit", false)
+    .set("password", newPassword);
   setState(state.set("identities", state.identities.set(identity.publicKey, newIdentity)));
 };
 
@@ -32,6 +36,7 @@ export const signContent = (identity: Identity) => () => {
     type: MessageType.SIGN_CONTENT,
     sender: MessageTarget.POPUP,
     publicKey: identity.publicKey,
+    privateKey: identity.privateKey,
   });
   window.close();
 };

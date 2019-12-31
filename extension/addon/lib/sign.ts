@@ -1,5 +1,9 @@
 const DATETIME_LEN = 24;
-const ECDSA = {
+const ECDSA_KEY = {
+  name: "ECDSA",
+  namedCurve: "P-256",
+};
+const ECDSA_SIGN = {
   name: "ECDSA",
   hash: "SHA-256",
 };
@@ -17,9 +21,19 @@ const ab2str = (input: ArrayBuffer) => {
   return String.fromCharCode.apply(null, new Uint8Array(input));
 };
 
-const exportPublicKey = async (publicKey: CryptoKey) => {
-  return btoa(ab2str(await window.crypto.subtle.exportKey("raw", publicKey)));
-};
+const exportPublicKey = async (publicKey: CryptoKey) =>
+  btoa(ab2str(await window.crypto.subtle.exportKey("raw", publicKey)));
+
+const exportPrivateKey = async (privateKey: CryptoKey) =>
+  JSON.stringify(await window.crypto.subtle.exportKey("jwk", privateKey));
+
+const importPublicKey = async (publicKeyStr: string) =>
+  await window.crypto.subtle.importKey("raw", str2ab(atob(publicKeyStr)), ECDSA_KEY, true, [
+    "verify",
+  ]);
+
+const importPrivateKey = async (privateKeyStr: string) =>
+  await window.crypto.subtle.importKey("jwk", JSON.parse(privateKeyStr), ECDSA_KEY, true, ["sign"]);
 
 const arrayConcat = (a: Uint8Array, b: Uint8Array) => {
   const c = new Uint8Array(a.length + b.length);
@@ -29,40 +43,42 @@ const arrayConcat = (a: Uint8Array, b: Uint8Array) => {
 };
 
 const getKeys = async () => {
-  const keyPair = await window.crypto.subtle.generateKey(
-    {
-      name: "ECDSA",
-      namedCurve: "P-256",
-    },
-    true,
-    ["sign", "verify"],
-  );
+  const keyPair = await window.crypto.subtle.generateKey(ECDSA_KEY, true, ["sign", "verify"]);
 
   return {
     publicKey: await exportPublicKey(keyPair.publicKey),
+    privateKey: await exportPrivateKey(keyPair.privateKey),
     keyPair,
   };
 };
 
-export const signMessage = async (privateKey: CryptoKey, messageStr: string) => {
+export const signMessage = async (privateKeyStr: string, messageStr: string) => {
+  const privateKey = await importPrivateKey(privateKeyStr);
+
   const enc = new TextEncoder();
   const datetimeStr = new Date().toISOString();
 
   const datetimeArray = enc.encode(datetimeStr);
   const messageArray = enc.encode(messageStr);
-  const contentArray = arrayConcat(datetimeArray, messageArray);
+  const datetimeMessageArray = arrayConcat(datetimeArray, messageArray);
 
-  const signatureArrayBuffer = await window.crypto.subtle.sign(ECDSA, privateKey, contentArray);
+  const signatureArrayBuffer = await window.crypto.subtle.sign(
+    ECDSA_SIGN,
+    privateKey,
+    datetimeMessageArray,
+  );
   const datetimeSignatureArray = arrayConcat(datetimeArray, new Uint8Array(signatureArrayBuffer));
 
   return { signature: btoa(ab2str(datetimeSignatureArray)) };
 };
 
 export const verifyMessage = async (
-  publicKey: CryptoKey,
+  publicKeyStr: string,
   datetimeSignatureStr: string,
   messageStr: string,
 ) => {
+  const publicKey = await importPublicKey(publicKeyStr);
+
   const datetimeSignatureArray = new Uint8Array(str2ab(atob(datetimeSignatureStr)));
   const datetimeArray = datetimeSignatureArray.slice(0, DATETIME_LEN);
   const signatureArray = datetimeSignatureArray.slice(DATETIME_LEN);
@@ -72,7 +88,7 @@ export const verifyMessage = async (
   const datetimeMessageArray = arrayConcat(datetimeArray, messageArray);
 
   const verified = await window.crypto.subtle.verify(
-    ECDSA,
+    ECDSA_SIGN,
     publicKey,
     signatureArray,
     datetimeMessageArray,
