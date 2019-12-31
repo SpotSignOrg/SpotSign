@@ -19,7 +19,7 @@ export const IdentityList = () => {
           <Button onClick={() => dispatch(createIdentity())}>Add Identity</Button>
         </Col>
       </Row>
-      {state.identities.map((identity, i) => (
+      {Array.from(state.identities.values()).map((identity, i) => (
         <IdentityManager key={i} identity={identity} />
       ))}
     </React.Fragment>

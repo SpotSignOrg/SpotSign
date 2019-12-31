@@ -16,16 +16,16 @@ export const MakeIdentity = Immutable.Record<IdentityProps>({
 });
 
 export interface StateProps {
-  readonly identities: Immutable.List<Identity>;
+  readonly identities: Immutable.OrderedMap<string, Identity>;
 }
 export interface StoredState {
-  identities: Array<IdentityProps>;
+  identities: Record<string, IdentityProps>;
 }
 
 export interface State extends Immutable.RecordOf<StateProps>, StateProps {}
 
 export const MakeState = Immutable.Record<StateProps>({
-  identities: Immutable.List<Identity>(),
+  identities: Immutable.OrderedMap(),
 });
 
 const initialState = MakeState();
@@ -41,10 +41,10 @@ export const StateContext = React.createContext({
 });
 
 const rehydrate = (storedState: StoredState) => {
-  let identities = Immutable.List();
+  let identities = Immutable.OrderedMap<string, Identity>();
 
-  if (storedState.identities) {
-    identities = Immutable.List(storedState.identities.map(MakeIdentity));
+  for (const publicKey in storedState.identities) {
+    identities = identities.set(publicKey, MakeIdentity(storedState.identities[publicKey]));
   }
 
   return MakeState({ identities });

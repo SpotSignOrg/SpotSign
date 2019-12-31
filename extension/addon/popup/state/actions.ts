@@ -8,7 +8,8 @@ export const createIdentity = () => async (state: State, setState: SetState) => 
   });
   console.log("received response", response);
   if (response.type === MessageType.SEND_KEYS) {
-    const newIdentities = state.identities.push(
+    const newIdentities = state.identities.set(
+      response.publicKey,
       MakeIdentity({
         name: "New Identity",
         publicKey: response.publicKey,
@@ -23,16 +24,7 @@ export const saveIdentity = (identity: Identity, newName: string, newPassword: s
   setState: SetState,
 ) => {
   const newIdentity = identity.set("name", newName).set("edit", false);
-
-  const newIdentities = state.identities.map(i => {
-    if (i.publicKey === newIdentity.publicKey) {
-      return newIdentity;
-    } else {
-      return i;
-    }
-  });
-
-  setState(state.set("identities", newIdentities));
+  setState(state.set("identities", state.identities.set(identity.publicKey, newIdentity)));
 };
 
 export const signContent = (identity: Identity) => () => {

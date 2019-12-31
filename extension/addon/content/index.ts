@@ -40,7 +40,7 @@ declare global {
   }
 
   function getAuthor(state: State, publicKey: string) {
-    for (const identity of state.identities) {
+    for (const identity of state.identities.values()) {
       if (identity.publicKey === publicKey) return identity.name;
     }
     return;
@@ -52,7 +52,6 @@ declare global {
     signature: string,
     publicKey: string,
   ) {
-    console.log("verifying signature", signature);
     const response = await sendToBackground({
       type: MessageType.GET_VERIFICATION,
       sender: MessageTarget.CONTENT,
