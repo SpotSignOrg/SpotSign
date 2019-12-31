@@ -4,8 +4,7 @@ import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 
 import { createIdentity } from "addon/popup/state/actions";
-import { IdentityDisplay } from "addon/popup/components/Identity/IdentityDisplay";
-import { IdentityEdit } from "addon/popup/components/Identity/IdentityEdit";
+import { IdentityManager } from "addon/popup/components/Identity/IdentityManager";
 import { useState } from "addon/popup/state";
 
 export const IdentityList = () => {
@@ -20,13 +19,9 @@ export const IdentityList = () => {
           <Button onClick={() => dispatch(createIdentity())}>Add Identity</Button>
         </Col>
       </Row>
-      {state.identities.map((identity, i) => {
-        if (identity.edit) {
-          return <IdentityEdit key={i} identity={identity} />;
-        } else {
-          return <IdentityDisplay key={i} identity={identity} />;
-        }
-      })}
+      {state.identities.map((identity, i) => (
+        <IdentityManager key={i} identity={identity} />
+      ))}
     </React.Fragment>
   );
 };
