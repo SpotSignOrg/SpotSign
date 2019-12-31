@@ -29,7 +29,7 @@ export const saveIdentity = (identity: Identity, newName: string, newPassword: s
 
 export const signContent = (identity: Identity) => () => {
   sendToBackground({
-    type: MessageType.GET_SIGNATURE,
+    type: MessageType.SIGN_CONTENT,
     sender: MessageTarget.POPUP,
     publicKey: identity.publicKey,
   });

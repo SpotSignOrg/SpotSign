@@ -9,9 +9,9 @@ export enum MessageType {
   SEND_CONTENT = "sendContent",
   GET_KEYS = "getKeys",
   SEND_KEYS = "sendKeys",
-  GET_SIGNATURE = "getSignature",
-  SEND_SIGNATURE_SUCCESS = "sendSignatureSuccess",
-  SEND_SIGNATURE_FAIL = "sendSignatureFail",
+  SIGN_CONTENT = "signContent",
+  CONTENT_SIGNED_SUCCESS = "sendSignatureSuccess",
+  CONTENT_SIGNED_FAIL = "sendSignatureFail",
   GET_VERIFICATION = "getVerification",
   SEND_VERIFICATION_SUCCESS = "sendVerificationSuccess",
   SEND_VERIFICATION_FAIL = "sendVerificationFail",
@@ -27,8 +27,8 @@ export interface MessageGetKeys extends MessageBase {
   type: MessageType.GET_KEYS;
 }
 
-export interface MessageGetSignature extends MessageBase {
-  type: MessageType.GET_SIGNATURE;
+export interface MessageSignContent extends MessageBase {
+  type: MessageType.SIGN_CONTENT;
   publicKey: string;
 }
 
@@ -39,20 +39,19 @@ export interface MessageGetVerification extends MessageBase {
   signature: string;
 }
 
-export type MessageToBackground = MessageGetKeys | MessageGetSignature | MessageGetVerification;
+export type MessageToBackground = MessageGetKeys | MessageSignContent | MessageGetVerification;
 
 export interface MessageSendKeys extends MessageBase {
   type: MessageType.SEND_KEYS;
   publicKey: string;
 }
 
-export interface MessageSendSignatureSuccess extends MessageBase {
-  type: MessageType.SEND_SIGNATURE_SUCCESS;
-  signature: string;
+export interface MessageContentSignedSuccess extends MessageBase {
+  type: MessageType.CONTENT_SIGNED_SUCCESS;
 }
 
-export interface MessageSendSignatureFail extends MessageBase {
-  type: MessageType.SEND_SIGNATURE_FAIL;
+export interface MessageContentSignedFail extends MessageBase {
+  type: MessageType.CONTENT_SIGNED_FAIL;
 }
 
 export interface MessageSendContent extends MessageBase {
@@ -78,8 +77,8 @@ export interface MessageSendVerificationFail extends MessageBase {
 export type MessageToPopup =
   | MessageSendKeys
   | MessageSendContent
-  | MessageSendSignatureSuccess
-  | MessageSendSignatureFail
+  | MessageContentSignedSuccess
+  | MessageContentSignedFail
   | MessageSendVerificationSuccess
   | MessageSendVerificationFail;
 
@@ -113,14 +112,18 @@ export const sendToContent = async (message: MessageToContent) => {
   return response;
 };
 
-export const sendToBackground = (message: MessageToBackground) => {
+export const sendToBackground = async (message: MessageToBackground) => {
   console.log("Sending message to background", message);
-  return browser.runtime.sendMessage(message);
+  const response = await browser.runtime.sendMessage(message);
+  console.log("Received response from background", response);
+  return response;
 };
 
-export const sendToPopup = (message: MessageToPopup) => {
+export const sendToPopup = async (message: MessageToPopup) => {
   console.log("Sending message to popup", message);
-  return browser.runtime.sendMessage(message);
+  const response = await browser.runtime.sendMessage(message);
+  console.log("Received response from popup", response);
+  return response;
 };
 
 export function listen(receiver: MessageTarget, listener: (_: Message) => Promise<Message | void>) {

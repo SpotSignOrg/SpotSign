@@ -15,7 +15,7 @@ const KEYS = new Map<string, CryptoKeyPair>();
   const getContent = async () => {
     const responses = await sendToContent({
       type: MessageType.GET_CONTENT,
-      sender: MessageTarget.POPUP,
+      sender: MessageTarget.BACKGROUND,
     });
     for (const response of responses) {
       if (response.type === MessageType.SEND_CONTENT) {
@@ -38,22 +38,29 @@ const KEYS = new Map<string, CryptoKeyPair>();
         };
       }
 
-      case MessageType.GET_SIGNATURE: {
+      case MessageType.SIGN_CONTENT: {
         const keyPair = KEYS.get(message.publicKey);
         const content = await getContent();
 
         if (keyPair && content) {
           const signature = (await signer.signMessage(keyPair.privateKey, content)).signature;
+
           await sendToContent({
             type: MessageType.WRITE_SIGNATURE,
-            sender: MessageTarget.POPUP,
+            sender: MessageTarget.BACKGROUND,
             content: content,
             signature: signature,
             publicKey: message.publicKey,
           });
+
+          return {
+            type: MessageType.CONTENT_SIGNED_SUCCESS,
+            sender: MessageTarget.BACKGROUND,
+          };
         }
+
         return {
-          type: MessageType.SEND_SIGNATURE_FAIL,
+          type: MessageType.CONTENT_SIGNED_FAIL,
           sender: MessageTarget.BACKGROUND,
         };
       }

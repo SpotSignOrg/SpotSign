@@ -6,7 +6,7 @@ import {
   sendToBackground,
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
-import { State } from "addon/popup/state";
+import { StoredState } from "addon/popup/state";
 declare global {
   interface Window {
     hasRun: boolean;
@@ -39,15 +39,17 @@ declare global {
     return content.replace(SPECIAL_CHARACTERS_RE, "").trim();
   }
 
-  function getAuthor(state: State, publicKey: string) {
-    for (const identity of state.identities.values()) {
-      if (identity.publicKey === publicKey) return identity.name;
+  function getAuthor(state: StoredState, publicKey: string) {
+    for (const identityPublicKey in state.identities) {
+      if (identityPublicKey === publicKey) {
+        return state.identities[identityPublicKey].name;
+      }
     }
     return;
   }
 
   async function verifySignature(
-    state: State,
+    state: StoredState,
     content: string,
     signature: string,
     publicKey: string,
@@ -107,7 +109,7 @@ declare global {
     return signaturesElements;
   }
 
-  async function verifySignatures(state: State, documentContent: string, nodes: NodeList) {
+  async function verifySignatures(state: StoredState, documentContent: string, nodes: NodeList) {
     const signaturesElements = findSignatureElements(nodes);
     const strippedContent = stripContent(documentContent);
 
@@ -250,7 +252,7 @@ declare global {
     });
   }
 
-  function observeDOM(state: State) {
+  function observeDOM(state: StoredState) {
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
         for (const node of mutation.addedNodes) {
@@ -277,7 +279,7 @@ declare global {
   }
   window.hasRun = true;
 
-  const state: State = await browser.storage.local.get();
+  const state: StoredState = await browser.storage.local.get();
 
   setupListener();
   verifySignatures(state, document.body.innerText, document.querySelectorAll("*"));
