@@ -18,12 +18,17 @@ export const createIdentity = () => async (state: State, setState: SetState) => 
   }
 };
 
-export const editIdentity = (newIdentity: Identity) => (state: State, setState: SetState) => {
-  const newIdentities = state.identities.map(identity => {
-    if (identity.publicKey === newIdentity.publicKey) {
+export const saveIdentity = (identity: Identity, newName: string, newPassword: string) => (
+  state: State,
+  setState: SetState,
+) => {
+  const newIdentity = identity.set("name", newName).set("edit", false);
+
+  const newIdentities = state.identities.map(i => {
+    if (i.publicKey === newIdentity.publicKey) {
       return newIdentity;
     } else {
-      return identity;
+      return i;
     }
   });
 

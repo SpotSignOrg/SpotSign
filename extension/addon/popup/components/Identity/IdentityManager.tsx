@@ -12,7 +12,7 @@ export const IdentityManager: React.FunctionComponent<{ identity: Identity }> = 
   const ariaId = `${identity.publicKey}-collapse`;
 
   return (
-    <div className="alert alert-info">
+    <div className="alert alert-primary">
       <Row
         onClick={() => setOpen(!open)}
         aria-controls={ariaId}
