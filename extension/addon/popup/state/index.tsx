@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Record, RecordOf, List } from "immutable";
+import * as Immutable from "immutable";
 
 export interface IdentityProps {
   readonly edit: boolean;
@@ -7,22 +7,25 @@ export interface IdentityProps {
   readonly publicKey: string;
 }
 
-export interface Identity extends RecordOf<IdentityProps>, IdentityProps {}
+export interface Identity extends Immutable.RecordOf<IdentityProps>, IdentityProps {}
 
-export const MakeIdentity = Record<IdentityProps>({
+export const MakeIdentity = Immutable.Record<IdentityProps>({
   edit: true,
   name: "No Name",
   publicKey: "No Public Key",
 });
 
 export interface StateProps {
-  readonly identities: List<Identity>;
+  readonly identities: Immutable.List<Identity>;
+}
+export interface StoredState {
+  identities: Array<IdentityProps>;
 }
 
-export interface State extends RecordOf<StateProps>, StateProps {}
+export interface State extends Immutable.RecordOf<StateProps>, StateProps {}
 
-export const MakeState = Record<StateProps>({
-  identities: List<Identity>(),
+export const MakeState = Immutable.Record<StateProps>({
+  identities: Immutable.List<Identity>(),
 });
 
 const initialState = MakeState();
@@ -37,17 +40,17 @@ export const StateContext = React.createContext({
   },
 });
 
-const rehydrate = (storedState: StateProps) => {
-  let identities = List();
+const rehydrate = (storedState: StoredState) => {
+  let identities = Immutable.List();
 
   if (storedState.identities) {
-    identities = List(storedState.identities.map(MakeIdentity));
+    identities = Immutable.List(storedState.identities.map(MakeIdentity));
   }
 
   return MakeState({ identities });
 };
 
-export const StateProvider: React.FunctionComponent<{ storedState: StateProps }> = ({
+export const StateProvider: React.FunctionComponent<{ storedState: StoredState }> = ({
   storedState,
   children,
 }) => {

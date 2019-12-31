@@ -2,9 +2,9 @@ import * as React from "react";
 import Container from "react-bootstrap/Container";
 
 import { IdentityList } from "addon/popup/components/Identity/IdentityList";
-import { StateProps, StateProvider } from "addon/popup/state";
+import { StoredState, StateProvider } from "addon/popup/state";
 
-export const Popup: React.FunctionComponent<{ storedState: StateProps }> = ({ storedState }) => {
+export const Popup: React.FunctionComponent<{ storedState: StoredState }> = ({ storedState }) => {
   const style = {
     width: "300px",
   };
