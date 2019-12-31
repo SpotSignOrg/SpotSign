@@ -7,12 +7,12 @@ import {
 } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
 import { State } from "addon/popup/state";
-
 declare global {
   interface Window {
     hasRun: boolean;
   }
 }
+
 (async function() {
   function escapeRegExp(input: string) {
     return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -52,6 +52,7 @@ declare global {
     signature: string,
     publicKey: string,
   ) {
+    console.log("verifying signature", signature);
     const response = await sendToBackground({
       type: MessageType.GET_VERIFICATION,
       sender: MessageTarget.CONTENT,
@@ -66,19 +67,14 @@ declare global {
       author: "",
     };
 
-    if (response.type === MessageType.SEND_VERIFICATION) {
-      if (response.verification.verified) {
-        verification.verified = response.verification.verified;
+    if (response.type === MessageType.SEND_VERIFICATION_SUCCESS) {
+      verification.verified = true;
+      verification.datetime = response.datetime;
 
-        if (response.verification.datetime) {
-          verification.datetime = response.verification.datetime;
-        }
+      const author = getAuthor(state, publicKey);
 
-        const author = getAuthor(state, publicKey);
-
-        if (author) {
-          verification.author = author;
-        }
+      if (author) {
+        verification.author = author;
       }
     }
     return verification;
@@ -239,7 +235,7 @@ declare global {
   }
 
   function setupListener() {
-    listen(MessageTarget.CONTENT, (message: MessageToContent) => {
+    listen(MessageTarget.CONTENT, async (message: MessageToContent) => {
       switch (message.type) {
         case MessageType.GET_CONTENT:
           return {
@@ -259,7 +255,7 @@ declare global {
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
         for (const node of mutation.addedNodes) {
-          const elements = (node as Element).querySelectorAll("a");
+          const elements = (node as Element).querySelectorAll("*");
           if (elements.length) {
             verifySignatures(state, document.body.innerText, elements);
           }
@@ -285,6 +281,6 @@ declare global {
   const state: State = await browser.storage.local.get();
 
   setupListener();
-  verifySignatures(state, document.body.innerText, document.querySelectorAll("a"));
+  verifySignatures(state, document.body.innerText, document.querySelectorAll("*"));
   observeDOM(state);
 })().catch(console.error);

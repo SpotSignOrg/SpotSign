@@ -16,7 +16,7 @@ export const IdentityDisplay: React.FunctionComponent<{ identity: Identity }> = 
   const ariaId = `${identity.publicKey}-collapse`;
 
   return (
-    <React.Fragment>
+    <div className="alert alert-info">
       <Row
         onClick={() => setOpen(!open)}
         aria-controls={ariaId}
@@ -39,6 +39,6 @@ export const IdentityDisplay: React.FunctionComponent<{ identity: Identity }> = 
           </Row>
         </div>
       </Collapse>
-    </React.Fragment>
+    </div>
   );
 };

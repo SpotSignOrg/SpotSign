@@ -6,12 +6,12 @@ export const createIdentity = () => async (state: State, setState: SetState) => 
     type: MessageType.GET_KEYS,
     sender: MessageTarget.POPUP,
   });
+  console.log("received response", response);
   if (response.type === MessageType.SEND_KEYS) {
     const newIdentities = state.identities.push(
       MakeIdentity({
         name: "New Identity",
-        privateKey: response.keys.private_key,
-        publicKey: response.keys.public_key,
+        publicKey: response.publicKey,
       }),
     );
     setState(state.set("identities", newIdentities));
@@ -55,11 +55,10 @@ export const signContent = (identity: Identity) => async () => {
     type: MessageType.GET_SIGNATURE,
     sender: MessageTarget.POPUP,
     content: content,
-    privateKey: identity.privateKey,
     publicKey: identity.publicKey,
   });
 
-  if (response.type === MessageType.SEND_SIGNATURE) {
+  if (response.type === MessageType.SEND_SIGNATURE_SUCCESS) {
     await sendToContent({
       type: MessageType.WRITE_SIGNATURE,
       sender: MessageTarget.POPUP,

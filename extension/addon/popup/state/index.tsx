@@ -4,7 +4,6 @@ import { Record, RecordOf, List } from "immutable";
 export interface IdentityProps {
   readonly edit: boolean;
   readonly name: string;
-  readonly privateKey: string;
   readonly publicKey: string;
 }
 
@@ -13,7 +12,6 @@ export interface Identity extends RecordOf<IdentityProps>, IdentityProps {}
 export const MakeIdentity = Record<IdentityProps>({
   edit: true,
   name: "No Name",
-  privateKey: "No Private Key",
   publicKey: "No Public Key",
 });
 

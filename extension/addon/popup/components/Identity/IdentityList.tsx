@@ -14,7 +14,7 @@ export const IdentityList = () => {
     <React.Fragment>
       <Row className="mb-4">
         <Col>
-          <h4>{state.identities.size} Identities</h4>
+          <h4 className="pt-1">{state.identities.size} Identities</h4>
         </Col>
         <Col className="text-right">
           <Button onClick={() => dispatch(createIdentity())}>Add Identity</Button>

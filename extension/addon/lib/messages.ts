@@ -1,5 +1,3 @@
-import { Keys, Verification } from "addon/signer";
-
 export enum MessageTarget {
   BACKGROUND = "background",
   POPUP = "popup",
@@ -12,9 +10,11 @@ export enum MessageType {
   GET_KEYS = "getKeys",
   SEND_KEYS = "sendKeys",
   GET_SIGNATURE = "getSignature",
-  SEND_SIGNATURE = "sendSignature",
+  SEND_SIGNATURE_SUCCESS = "sendSignatureSuccess",
+  SEND_SIGNATURE_FAIL = "sendSignatureFail",
   GET_VERIFICATION = "getVerification",
-  SEND_VERIFICATION = "sendVerification",
+  SEND_VERIFICATION_SUCCESS = "sendVerificationSuccess",
+  SEND_VERIFICATION_FAIL = "sendVerificationFail",
   WRITE_SIGNATURE = "writeSignature",
 }
 
@@ -30,7 +30,6 @@ export interface MessageGetKeys extends MessageBase {
 export interface MessageGetSignature extends MessageBase {
   type: MessageType.GET_SIGNATURE;
   publicKey: string;
-  privateKey: string;
   content: string;
 }
 
@@ -45,12 +44,16 @@ export type MessageToBackground = MessageGetKeys | MessageGetSignature | Message
 
 export interface MessageSendKeys extends MessageBase {
   type: MessageType.SEND_KEYS;
-  keys: Keys;
+  publicKey: string;
 }
 
-export interface MessageSendSignature extends MessageBase {
-  type: MessageType.SEND_SIGNATURE;
+export interface MessageSendSignatureSuccess extends MessageBase {
+  type: MessageType.SEND_SIGNATURE_SUCCESS;
   signature: string;
+}
+
+export interface MessageSendSignatureFail extends MessageBase {
+  type: MessageType.SEND_SIGNATURE_FAIL;
 }
 
 export interface MessageSendContent extends MessageBase {
@@ -58,16 +61,28 @@ export interface MessageSendContent extends MessageBase {
   content: string;
 }
 
-export interface MessageSendVerification extends MessageBase {
-  type: MessageType.SEND_VERIFICATION;
-  verification: Verification;
+export interface MessageSendVerificationSuccess extends MessageBase {
+  type: MessageType.SEND_VERIFICATION_SUCCESS;
+  datetime: string;
+}
+
+export enum VerificationFailReason {
+  KEYS_NOT_FOUND = "keysNotFound",
+  INVALID_SIGNATURE = "invalidSignature",
+}
+
+export interface MessageSendVerificationFail extends MessageBase {
+  type: MessageType.SEND_VERIFICATION_FAIL;
+  reason: VerificationFailReason;
 }
 
 export type MessageToPopup =
   | MessageSendKeys
   | MessageSendContent
-  | MessageSendSignature
-  | MessageSendVerification;
+  | MessageSendSignatureSuccess
+  | MessageSendSignatureFail
+  | MessageSendVerificationSuccess
+  | MessageSendVerificationFail;
 
 export interface MessageGetContent extends MessageBase {
   type: MessageType.GET_CONTENT;
@@ -84,7 +99,7 @@ export type MessageToContent = MessageGetContent | MessageWriteSignature;
 
 export type Message = MessageToBackground | MessageToPopup | MessageToContent;
 
-export async function sendToContent(message: MessageToContent) {
+export const sendToContent = async (message: MessageToContent) => {
   const tabs = await browser.tabs.query({
     currentWindow: true,
     active: true,
@@ -97,25 +112,23 @@ export async function sendToContent(message: MessageToContent) {
   const response = await Promise.all(responses);
   console.log("Responded with", response);
   return response;
-}
+};
 
-export function sendToBackground(message: MessageToBackground) {
+export const sendToBackground = (message: MessageToBackground) => {
   console.log("Sending message to background", message);
   return browser.runtime.sendMessage(message);
-}
+};
 
-export function sendToPopup(message: MessageToPopup) {
+export const sendToPopup = (message: MessageToPopup) => {
   console.log("Sending message to popup", message);
   return browser.runtime.sendMessage(message);
-}
+};
 
-export function listen(receiver: MessageTarget, listener: (_: Message) => Message | void) {
-  return browser.runtime.onMessage.addListener((message: Message, _, sendResponse) => {
+export function listen(receiver: MessageTarget, listener: (_: Message) => Promise<Message | void>) {
+  browser.runtime.onMessage.addListener(async (message: Message) => {
     console.log(`Received message in ${receiver}:`, message);
-    const response = listener(message);
+    const response = await listener(message);
     console.log(`Responded with`, response);
-    if (response) {
-      sendResponse(response);
-    }
+    return response;
   });
 }
