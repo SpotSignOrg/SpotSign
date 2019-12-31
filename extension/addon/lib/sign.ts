@@ -4,18 +4,17 @@ const ECDSA = {
   hash: "SHA-256",
 };
 
-const str2ab = (decoded: string) => {
-  const buf = new ArrayBuffer(decoded.length);
-  const uint8 = new Uint8Array(buf);
-  for (let i = 0, strLen = decoded.length; i < strLen; i++) {
-    uint8[i] = decoded.charCodeAt(i);
+const str2ab = (input: string) => {
+  const output = new ArrayBuffer(input.length);
+  const uint8 = new Uint8Array(output);
+  for (let i = 0, strLen = input.length; i < strLen; i++) {
+    uint8[i] = input.charCodeAt(i);
   }
-  return buf;
+  return output;
 };
 
-const ab2str = (buf: ArrayBuffer) => {
-  const uint8 = new Uint8Array(buf);
-  return String.fromCharCode.apply(null, uint8);
+const ab2str = (input: ArrayBuffer) => {
+  return String.fromCharCode.apply(null, new Uint8Array(input));
 };
 
 const exportPublicKey = async (publicKey: CryptoKey) => {
@@ -39,50 +38,51 @@ const getKeys = async () => {
     ["sign", "verify"],
   );
 
-  const keys = {
+  return {
     publicKey: await exportPublicKey(keyPair.publicKey),
     keyPair,
   };
-  console.log("generated", keys);
-  return keys;
 };
 
-export const signMessage = async (privateKey: CryptoKey, message: string) => {
+export const signMessage = async (privateKey: CryptoKey, messageStr: string) => {
   const enc = new TextEncoder();
-  const datetime = new Date().toISOString();
-  const datetimeEncoded = enc.encode(datetime);
-  const messageEncoded = enc.encode(message);
-  const contentEncoded = arrayConcat(datetimeEncoded, messageEncoded);
-  const signature = await window.crypto.subtle.sign(ECDSA, privateKey, contentEncoded);
-  const datetimeSignature = arrayConcat(datetimeEncoded, new Uint8Array(signature));
+  const datetimeStr = new Date().toISOString();
 
-  return { signature: btoa(ab2str(datetimeSignature)) };
+  const datetimeArray = enc.encode(datetimeStr);
+  const messageArray = enc.encode(messageStr);
+  const contentArray = arrayConcat(datetimeArray, messageArray);
+
+  const signatureArrayBuffer = await window.crypto.subtle.sign(ECDSA, privateKey, contentArray);
+  const datetimeSignatureArray = arrayConcat(datetimeArray, new Uint8Array(signatureArrayBuffer));
+
+  return { signature: btoa(ab2str(datetimeSignatureArray)) };
 };
 
 export const verifyMessage = async (
   publicKey: CryptoKey,
-  signatureRaw: string,
-  message: string,
+  datetimeSignatureStr: string,
+  messageStr: string,
 ) => {
-  const datetimeSignature = new Uint8Array(str2ab(atob(signatureRaw)));
-  const datetime = datetimeSignature.slice(0, DATETIME_LEN);
-  const signature = datetimeSignature.slice(DATETIME_LEN);
+  const datetimeSignatureArray = new Uint8Array(str2ab(atob(datetimeSignatureStr)));
+  const datetimeArray = datetimeSignatureArray.slice(0, DATETIME_LEN);
+  const signatureArray = datetimeSignatureArray.slice(DATETIME_LEN);
 
   const enc = new TextEncoder();
-  const messageEncoded = enc.encode(message);
-  const datetimeMessageEncoded = arrayConcat(datetime, messageEncoded);
-  const verification = await window.crypto.subtle.verify(
+  const messageArray = enc.encode(messageStr);
+  const datetimeMessageArray = arrayConcat(datetimeArray, messageArray);
+
+  const verified = await window.crypto.subtle.verify(
     ECDSA,
     publicKey,
-    signature,
-    datetimeMessageEncoded,
+    signatureArray,
+    datetimeMessageArray,
   );
 
   const dec = new TextDecoder();
-  const datetimeDecoded = dec.decode(datetime);
+  const datetimeDecoded = dec.decode(datetimeArray);
 
   return {
-    verified: verification,
+    verified: verified,
     datetime: datetimeDecoded,
   };
 };
