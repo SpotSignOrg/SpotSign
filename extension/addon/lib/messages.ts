@@ -30,7 +30,6 @@ export interface MessageGetKeys extends MessageBase {
 export interface MessageGetSignature extends MessageBase {
   type: MessageType.GET_SIGNATURE;
   publicKey: string;
-  content: string;
 }
 
 export interface MessageGetVerification extends MessageBase {

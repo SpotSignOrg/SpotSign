@@ -1,9 +1,10 @@
 import { assertNever } from "addon/lib/never";
 import {
-  MessageTarget,
-  MessageType,
-  MessageToBackground,
   listen,
+  MessageTarget,
+  MessageToBackground,
+  MessageType,
+  sendToContent,
   VerificationFailReason,
 } from "addon/lib/messages";
 import signer from "addon/lib/sign";
@@ -11,6 +12,19 @@ import signer from "addon/lib/sign";
 const KEYS = new Map<string, CryptoKeyPair>();
 
 (async () => {
+  const getContent = async () => {
+    const responses = await sendToContent({
+      type: MessageType.GET_CONTENT,
+      sender: MessageTarget.POPUP,
+    });
+    for (const response of responses) {
+      if (response.type === MessageType.SEND_CONTENT) {
+        return response.content;
+      }
+    }
+    return;
+  };
+
   listen(MessageTarget.BACKGROUND, async (message: MessageToBackground) => {
     switch (message.type) {
       case MessageType.GET_KEYS: {
@@ -26,15 +40,17 @@ const KEYS = new Map<string, CryptoKeyPair>();
 
       case MessageType.GET_SIGNATURE: {
         const keyPair = KEYS.get(message.publicKey);
+        const content = await getContent();
 
-        if (keyPair) {
-          const signature = (await signer.signMessage(keyPair.privateKey, message.content))
-            .signature;
-          return {
-            type: MessageType.SEND_SIGNATURE_SUCCESS,
-            sender: MessageTarget.BACKGROUND,
-            signature,
-          };
+        if (keyPair && content) {
+          const signature = (await signer.signMessage(keyPair.privateKey, content)).signature;
+          await sendToContent({
+            type: MessageType.WRITE_SIGNATURE,
+            sender: MessageTarget.POPUP,
+            content: content,
+            signature: signature,
+            publicKey: message.publicKey,
+          });
         }
         return {
           type: MessageType.SEND_SIGNATURE_FAIL,
