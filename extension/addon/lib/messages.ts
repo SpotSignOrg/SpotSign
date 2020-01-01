@@ -110,23 +110,17 @@ export const sendToContent = async (message: MessageToContent) => {
     console.log("Sending message", message, "to content tab", tab.id);
     responses.push(browser.tabs.sendMessage(tab.id, message));
   }
-  const response = await Promise.all(responses);
-  console.log("Responded with", response);
-  return response;
+  return await Promise.all(responses);
 };
 
 export const sendToBackground = async (message: MessageToBackground) => {
   console.log("Sending message to background", message);
-  const response = await browser.runtime.sendMessage(message);
-  console.log("Received response from background", response);
-  return response;
+  return await browser.runtime.sendMessage(message);
 };
 
 export const sendToPopup = async (message: MessageToPopup) => {
   console.log("Sending message to popup", message);
-  const response = await browser.runtime.sendMessage(message);
-  console.log("Received response from popup", response);
-  return response;
+  return await browser.runtime.sendMessage(message);
 };
 
 export const listen = (

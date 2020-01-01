@@ -16,7 +16,6 @@ export const IdentityEdit: React.FunctionComponent<{ identity: Identity }> = ({ 
   const { dispatch } = useState();
 
   const validPasswords = password1.length >= 6 && password2.length >= 6 && password1 === password2;
-  console.log("valid passwords", validPasswords);
   const validName = name.length > 0;
   const validForm = validPasswords && validName;
 

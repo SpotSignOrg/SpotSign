@@ -6,7 +6,7 @@ export const createIdentity = () => async (state: State, setState: SetState) => 
     type: MessageType.GET_KEYS,
     sender: MessageTarget.POPUP,
   });
-  console.log("received response", response);
+
   if (response.type === MessageType.SEND_KEYS) {
     const newIdentities = state.identities.set(
       response.publicKey,
