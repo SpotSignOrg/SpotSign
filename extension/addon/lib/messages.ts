@@ -64,6 +64,7 @@ export interface MessageSendContent extends MessageBase {
 export interface MessageSendVerificationSuccess extends MessageBase {
   type: MessageType.SEND_VERIFICATION_SUCCESS;
   datetime: string;
+  author: string;
 }
 
 export enum VerificationFailReason {

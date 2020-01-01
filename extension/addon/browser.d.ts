@@ -42,4 +42,7 @@ interface Browser {
 
 declare global {
   const browser: Browser;
+  interface Window {
+    hasRun: boolean;
+  }
 }

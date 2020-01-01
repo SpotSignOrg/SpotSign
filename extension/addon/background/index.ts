@@ -7,9 +7,15 @@ import {
   sendToContent,
   VerificationFailReason,
 } from "addon/lib/messages";
+import { StoredState } from "addon/popup/state";
 import signer from "addon/lib/sign";
 
 (async () => {
+  const getAuthor = async (publicKey: string) => {
+    const storedState = (await browser.storage.local.get()) as StoredState;
+    return storedState.identities[publicKey].name;
+  };
+
   const getContent = async () => {
     const responses = await sendToContent({
       type: MessageType.GET_CONTENT,
@@ -74,6 +80,7 @@ import signer from "addon/lib/sign";
             type: MessageType.SEND_VERIFICATION_SUCCESS,
             sender: MessageTarget.BACKGROUND,
             datetime: verification.datetime,
+            author: await getAuthor(message.publicKey),
           };
         } else {
           return {
