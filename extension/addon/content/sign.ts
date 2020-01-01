@@ -1,13 +1,13 @@
 import * as Util from "addon/content/util";
 
-export function getActiveContent() {
+export const getActiveContent = () => {
   return (
     (document.activeElement as HTMLInputElement).value ||
     (document.activeElement as HTMLElement).innerText
   );
-}
+};
 
-function findContentElement(parent: HTMLElement, content: string) {
+const findContentElement = (parent: HTMLElement, content: string) => {
   const reverse = (str: string) =>
     str
       .split("")
@@ -33,9 +33,9 @@ function findContentElement(parent: HTMLElement, content: string) {
   }
 
   return contentElement;
-}
+};
 
-function formatMarkdown(signatureUrl: string) {
+const formatMarkdown = (signatureUrl: string) => {
   const markdownDomains = ["reddit.com", "github.com"];
 
   let hasMarkdown = false;
@@ -49,9 +49,9 @@ function formatMarkdown(signatureUrl: string) {
     return `[Verify Signature](${signatureUrl})`;
   }
   return signatureUrl;
-}
+};
 
-function formatSignature(content: string, signature: string, publicKey: string) {
+const formatSignature = (content: string, signature: string, publicKey: string) => {
   const a = content[0];
   const b = content[content.length - 1];
   const c = content.length;
@@ -59,9 +59,13 @@ function formatSignature(content: string, signature: string, publicKey: string) 
   const k = encodeURIComponent(publicKey);
   const url = `${Util.SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${s}&k=${k}`;
   return `\n\n${formatMarkdown(url)}`;
-}
+};
 
-export function writeActiveSignature(signedContent: string, signature: string, publicKey: string) {
+export const writeActiveSignature = (
+  signedContent: string,
+  signature: string,
+  publicKey: string,
+) => {
   const activeElement = document.activeElement;
   if (!activeElement) return;
 
@@ -77,4 +81,4 @@ export function writeActiveSignature(signedContent: string, signature: string, p
     contentElement.textContent += signatureUrl;
     activeElement.dispatchEvent(new Event("input", { bubbles: true }));
   }
-}
+};

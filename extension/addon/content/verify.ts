@@ -1,7 +1,7 @@
 import { MessageTarget, MessageType, sendToBackground } from "addon/lib/messages";
 import * as Util from "addon/content/util";
 
-async function verifySignature(content: string, signature: string, publicKey: string) {
+const verifySignature = async (content: string, signature: string, publicKey: string) => {
   const response = await sendToBackground({
     type: MessageType.GET_VERIFICATION,
     sender: MessageTarget.CONTENT,
@@ -14,9 +14,9 @@ async function verifySignature(content: string, signature: string, publicKey: st
     return response;
   }
   return;
-}
+};
 
-function findSignatureElements(nodes: NodeList) {
+const findSignatureElements = (nodes: NodeList) => {
   const signaturesElements = new Map<string, Set<HTMLElement>>();
 
   for (const node of nodes) {
@@ -42,9 +42,9 @@ function findSignatureElements(nodes: NodeList) {
     }
   }
   return signaturesElements;
-}
+};
 
-export async function verifySignatures(documentContent: string, nodes: NodeList) {
+export const verifySignatures = async (documentContent: string, nodes: NodeList) => {
   const signaturesElements = findSignatureElements(nodes);
   const strippedContent = Util.stripContent(documentContent);
 
@@ -91,9 +91,9 @@ export async function verifySignatures(documentContent: string, nodes: NodeList)
       }
     }
   }
-}
+};
 
-export function observeDOM() {
+export const observeDOM = () => {
   const observer = new MutationObserver(mutationsList => {
     for (const mutation of mutationsList) {
       for (const node of mutation.addedNodes) {
@@ -107,4 +107,4 @@ export function observeDOM() {
 
   // Start observing the target node for configured mutations
   observer.observe(document.body, { childList: true, subtree: true });
-}
+};

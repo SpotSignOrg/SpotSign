@@ -129,11 +129,14 @@ export const sendToPopup = async (message: MessageToPopup) => {
   return response;
 };
 
-export function listen(receiver: MessageTarget, listener: (_: Message) => Promise<Message | void>) {
+export const listen = (
+  receiver: MessageTarget,
+  listener: (_: Message) => Promise<Message | void>,
+) => {
   browser.runtime.onMessage.addListener(async (message: Message) => {
     console.log(`Received message in ${receiver}:`, message);
     const response = await listener(message);
     console.log(`Responded with`, response);
     return response;
   });
-}
+};

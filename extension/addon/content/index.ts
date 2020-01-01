@@ -4,7 +4,7 @@ import * as Util from "addon/content/util";
 import { getActiveContent, writeActiveSignature } from "addon/content/sign";
 import { verifySignatures, observeDOM } from "addon/content/verify";
 
-(async function() {
+(async () => {
   /**
    * Check and set a global guard variable.
    * If this content script is injected into the same page again,
@@ -16,7 +16,7 @@ import { verifySignatures, observeDOM } from "addon/content/verify";
   }
   window.hasRun = true;
 
-  function setupListener() {
+  const setupListener = () => {
     listen(MessageTarget.CONTENT, async (message: MessageToContent) => {
       switch (message.type) {
         case MessageType.GET_CONTENT:
@@ -31,7 +31,7 @@ import { verifySignatures, observeDOM } from "addon/content/verify";
           return assertNever(message);
       }
     });
-  }
+  };
 
   setupListener();
   verifySignatures(document.body.innerText, document.querySelectorAll("*"));

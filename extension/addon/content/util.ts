@@ -1,6 +1,6 @@
-export function escapeRegExp(input: string) {
+export const escapeRegExp = (input: string) => {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
-}
+};
 
 export const SIGN_HOST = "https://spotsign.org";
 export const SPECIAL_CHARACTERS = "\r\n !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~";
@@ -19,6 +19,6 @@ export const SIGNATURES_RE = new RegExp(
   "gm",
 );
 
-export function stripContent(content: string) {
+export const stripContent = (content: string) => {
   return content.replace(SPECIAL_CHARACTERS_RE, "").trim();
-}
+};
