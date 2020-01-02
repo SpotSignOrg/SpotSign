@@ -15,13 +15,15 @@ export const IdentityList = () => {
         <Col>
           <h4 className="pt-1">{state.identities.size} Identities</h4>
         </Col>
-        <Col className="text-right">
-          <Button onClick={() => dispatch(createIdentity())}>Add Identity</Button>
-        </Col>
       </Row>
       {Array.from(state.identities.values()).map((identity, i) => (
         <IdentityManager key={i} identity={identity} />
       ))}
+      <Row>
+        <Col className="text-right">
+          <Button onClick={() => dispatch(createIdentity())}>Add Identity</Button>
+        </Col>
+      </Row>
     </React.Fragment>
   );
 };

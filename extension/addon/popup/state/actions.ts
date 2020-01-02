@@ -31,6 +31,11 @@ export const saveIdentity = (identity: Identity, newName: string, newPassword: s
   setState(state.set("identities", state.identities.set(identity.publicKey, newIdentity)));
 };
 
+export const deleteIdentity = (identity: Identity) => (state: State, setState: SetState) => {
+  console.log("deleting", identity);
+  setState(state.set("identities", state.identities.remove(identity.publicKey)));
+};
+
 export const signContent = (identity: Identity) => () => {
   sendToBackground({
     type: MessageType.SIGN_CONTENT,
