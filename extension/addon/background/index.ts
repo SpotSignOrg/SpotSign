@@ -8,7 +8,7 @@ import {
   VerificationFailReason,
 } from "addon/lib/messages";
 import { StoredState } from "addon/popup/state";
-import signer from "addon/lib/sign";
+import signer from "addon/lib/signer";
 
 const getAuthor = async (publicKey: string) => {
   const storedState = (await browser.storage.local.get()) as StoredState;
