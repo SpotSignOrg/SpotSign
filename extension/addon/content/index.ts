@@ -1,6 +1,5 @@
 import { MessageTarget, MessageType, MessageToContent, listen } from "addon/lib/messages";
 import { assertNever } from "addon/lib/never";
-import * as Util from "addon/content/util";
 import { getActiveContent, writeActiveSignature } from "addon/content/sign";
 import { verifySignatures, observeDOM } from "addon/content/verify";
 
@@ -16,24 +15,21 @@ import { verifySignatures, observeDOM } from "addon/content/verify";
   }
   window.hasRun = true;
 
-  const setupListener = () => {
-    listen(MessageTarget.CONTENT, async (message: MessageToContent) => {
-      switch (message.type) {
-        case MessageType.GET_CONTENT:
-          return {
-            type: MessageType.SEND_CONTENT,
-            sender: MessageTarget.CONTENT,
-            content: Util.stripContent(getActiveContent()),
-          };
-        case MessageType.WRITE_SIGNATURE:
-          return writeActiveSignature(message.content, message.signature, message.publicKey);
-        default:
-          return assertNever(message);
-      }
-    });
-  };
+  listen(MessageTarget.CONTENT, async (message: MessageToContent) => {
+    switch (message.type) {
+      case MessageType.GET_CONTENT:
+        return {
+          type: MessageType.SEND_CONTENT,
+          sender: MessageTarget.CONTENT,
+          content: getActiveContent(),
+        };
+      case MessageType.WRITE_SIGNATURE:
+        return writeActiveSignature(message.content, message.signature, message.publicKey);
+      default:
+        return assertNever(message);
+    }
+  });
 
-  setupListener();
   verifySignatures(document.body.innerText, document.querySelectorAll("*"));
   observeDOM();
 })().catch(console.error);

@@ -1,9 +1,9 @@
 import * as Util from "addon/content/util";
 
 export const getActiveContent = () => {
-  return (
+  return Util.stripContent(
     (document.activeElement as HTMLInputElement).value ||
-    (document.activeElement as HTMLElement).innerText
+      (document.activeElement as HTMLElement).innerText,
   );
 };
 
