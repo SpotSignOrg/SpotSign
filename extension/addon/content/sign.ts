@@ -52,10 +52,16 @@ const formatMarkdown = (signatureUrl: string) => {
   return signatureUrl;
 };
 
-const formatSignature = (content: string, diff: string, signature: string, publicKey: string) => {
-  const a = content[0];
-  const b = content[content.length - 1];
-  const c = content.length;
+const formatSignature = (
+  signedContent: string,
+  diff: string,
+  signature: string,
+  publicKey: string,
+) => {
+  const strippedContent = stripContent(signedContent);
+  const a = strippedContent[0];
+  const b = strippedContent[strippedContent.length - 1];
+  const c = strippedContent.length - 2;
   const d = diff;
   const s = signature;
   const k = publicKey;
@@ -71,10 +77,9 @@ export const writeActiveSignature = (
   const activeElement = document.activeElement;
   if (!activeElement) return;
 
-  const strippedContent = stripContent(signedContent);
   const diff = diffContent(signedContent);
   const contentElement = findContentElement(activeElement as HTMLElement, signedContent);
-  const signatureUrl = formatSignature(strippedContent, diff, signature, publicKey);
+  const signatureUrl = formatSignature(signedContent, diff, signature, publicKey);
 
   if ((contentElement as HTMLInputElement).value) {
     (contentElement as HTMLInputElement).value += signatureUrl;

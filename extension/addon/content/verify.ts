@@ -2,21 +2,6 @@ import { MessageTarget, MessageType, sendToBackground } from "addon/lib/messages
 import * as Util from "addon/content/util";
 import { stripContent, undiffContent } from "addon/content/strip";
 
-const verifySignature = async (content: string, signature: string, publicKey: string) => {
-  const response = await sendToBackground({
-    type: MessageType.GET_VERIFICATION,
-    sender: MessageTarget.CONTENT,
-    publicKey: publicKey,
-    content,
-    signature,
-  });
-
-  if (response.type === MessageType.SEND_VERIFICATION_SUCCESS) {
-    return response;
-  }
-  return;
-};
-
 const findSignatureElements = (nodes: NodeList) => {
   const signaturesElements = new Map<string, Set<HTMLElement>>();
 
@@ -59,20 +44,28 @@ export const verifySignatures = async (documentContent: string, nodes: NodeList)
       const diff = signatureMatch[4];
       const signature = signatureMatch[5];
       const publicKey = signatureMatch[6];
-      let verification;
 
       const contentRe = new RegExp(
-        `(?=(${Util.escapeRegExp(a)}[\\s\\S]{${c - 2}}${Util.escapeRegExp(b)}))`,
+        `(?=(${Util.escapeRegExp(a)}[\\s\\S]{${c}}${Util.escapeRegExp(b)}))`,
         "gm",
       );
 
       const contentMatches = Array.from(strippedContent.matchAll(contentRe));
 
+      let verification;
       for (const contentMatch of contentMatches) {
         const strippedContent = contentMatch[1];
         const content = undiffContent(strippedContent, diff);
-        verification = await verifySignature(content, signature, publicKey);
-        if (verification) {
+        const response = await sendToBackground({
+          type: MessageType.GET_VERIFICATION,
+          sender: MessageTarget.CONTENT,
+          publicKey: publicKey,
+          content,
+          signature,
+        });
+
+        if (response.type === MessageType.SEND_VERIFICATION_SUCCESS) {
+          verification = response;
           break;
         }
       }
