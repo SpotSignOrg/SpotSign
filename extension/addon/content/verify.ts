@@ -38,8 +38,8 @@ export const verifySignatures = async (documentContent: string, nodes: NodeList)
     const signatureMatches = Array.from(signatureUrl.matchAll(Util.SIGNATURES_RE));
 
     for (const signatureMatch of signatureMatches) {
-      const a = signatureMatch[1];
-      const b = signatureMatch[2];
+      const a = decodeURIComponent(signatureMatch[1]);
+      const b = decodeURIComponent(signatureMatch[2]);
       const c = parseInt(signatureMatch[3]);
       const diff = signatureMatch[4];
       const signature = signatureMatch[5];
@@ -56,6 +56,7 @@ export const verifySignatures = async (documentContent: string, nodes: NodeList)
       for (const contentMatch of contentMatches) {
         const strippedContent = contentMatch[1];
         const content = undiffContent(strippedContent, diff);
+
         const response = await sendToBackground({
           type: MessageType.GET_VERIFICATION,
           sender: MessageTarget.CONTENT,

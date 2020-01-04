@@ -9,6 +9,6 @@ export const AMP_RE = "&(?:amp;)?";
 export const SIGNATURES_RE = new RegExp(
   `${escapeRegExp(
     SIGN_HOST,
-  )}\\/v\\/\\?a=(.)${AMP_RE}b=(.)${AMP_RE}c=(\\d+)${AMP_RE}d=(${BASE64_RE})${AMP_RE}s=(${BASE64_RE})${AMP_RE}k=(${BASE64_RE})`,
+  )}\\/v\\/\\?a=(${BASE64_RE})${AMP_RE}b=(${BASE64_RE})${AMP_RE}c=(\\d+)${AMP_RE}d=(${BASE64_RE})${AMP_RE}s=(${BASE64_RE})${AMP_RE}k=(${BASE64_RE})`,
   "gm",
 );

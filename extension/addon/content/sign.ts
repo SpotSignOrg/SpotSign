@@ -59,8 +59,8 @@ const formatSignature = (
   publicKey: string,
 ) => {
   const strippedContent = stripContent(signedContent);
-  const a = strippedContent[0];
-  const b = strippedContent[strippedContent.length - 1];
+  const a = encodeURIComponent(strippedContent[0]);
+  const b = encodeURIComponent(strippedContent[strippedContent.length - 1]);
   const c = strippedContent.length - 2;
   const d = diff;
   const s = signature;
