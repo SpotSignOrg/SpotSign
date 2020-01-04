@@ -56,9 +56,9 @@ export const verifySignatures = async (documentContent: string, nodes: NodeList)
       const a = signatureMatch[1];
       const b = signatureMatch[2];
       const c = parseInt(signatureMatch[3]);
-      const diff = unescape(signatureMatch[4]);
-      const signature = unescape(signatureMatch[5]);
-      const publicKey = unescape(signatureMatch[6]);
+      const diff = signatureMatch[4];
+      const signature = signatureMatch[5];
+      const publicKey = signatureMatch[6];
       let verification;
 
       const contentRe = new RegExp(

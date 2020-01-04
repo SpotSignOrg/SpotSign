@@ -1,3 +1,5 @@
+import base64url from "base64url";
+
 const DATETIME_LEN = 24;
 const ECDSA_KEY = {
   name: "ECDSA",
@@ -22,15 +24,19 @@ const ab2str = (input: ArrayBuffer) => {
 };
 
 const exportPublicKey = async (publicKey: CryptoKey) =>
-  btoa(ab2str(await window.crypto.subtle.exportKey("raw", publicKey)));
+  base64url.encode(ab2str(await window.crypto.subtle.exportKey("raw", publicKey)));
 
 const exportPrivateKey = async (privateKey: CryptoKey) =>
   JSON.stringify(await window.crypto.subtle.exportKey("jwk", privateKey));
 
 const importPublicKey = async (publicKeyStr: string) =>
-  await window.crypto.subtle.importKey("raw", str2ab(atob(publicKeyStr)), ECDSA_KEY, true, [
-    "verify",
-  ]);
+  await window.crypto.subtle.importKey(
+    "raw",
+    str2ab(base64url.decode(publicKeyStr)),
+    ECDSA_KEY,
+    true,
+    ["verify"],
+  );
 
 const importPrivateKey = async (privateKeyStr: string) =>
   await window.crypto.subtle.importKey("jwk", JSON.parse(privateKeyStr), ECDSA_KEY, true, ["sign"]);
@@ -69,7 +75,7 @@ export const signMessage = async (privateKeyStr: string, messageStr: string) => 
   );
   const datetimeSignatureArray = arrayConcat(datetimeArray, new Uint8Array(signatureArrayBuffer));
 
-  return { signature: btoa(ab2str(datetimeSignatureArray)) };
+  return { signature: base64url.encode(ab2str(datetimeSignatureArray)) };
 };
 
 export const verifyMessage = async (
@@ -79,7 +85,7 @@ export const verifyMessage = async (
 ) => {
   const publicKey = await importPublicKey(publicKeyStr);
 
-  const datetimeSignatureArray = new Uint8Array(str2ab(atob(datetimeSignatureStr)));
+  const datetimeSignatureArray = new Uint8Array(str2ab(base64url.decode(datetimeSignatureStr)));
   const datetimeArray = datetimeSignatureArray.slice(0, DATETIME_LEN);
   const signatureArray = datetimeSignatureArray.slice(DATETIME_LEN);
 

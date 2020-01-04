@@ -56,9 +56,9 @@ const formatSignature = (content: string, diff: string, signature: string, publi
   const a = content[0];
   const b = content[content.length - 1];
   const c = content.length;
-  const d = encodeURIComponent(diff);
-  const s = encodeURIComponent(signature);
-  const k = encodeURIComponent(publicKey);
+  const d = diff;
+  const s = signature;
+  const k = publicKey;
   const url = `${Util.SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&d=${d}&s=${s}&k=${k}`;
   return `\n\n${formatMarkdown(url)}`;
 };

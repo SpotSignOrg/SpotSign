@@ -1,3 +1,5 @@
+import base64url from "base64url";
+
 const SPECIAL_CHARACTERS = "\r\n !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~";
 const SPECIAL_CHARACTERS_RE = new RegExp(
   SPECIAL_CHARACTERS.split("")
@@ -62,11 +64,11 @@ export const diffContent = (content: string) => {
     }
   }
 
-  return btoa(arr2str(diff));
+  return base64url.encode(arr2str(diff));
 };
 
 export const undiffContent = (content: string, diffStr: string) => {
-  const diff = str2arr(atob(diffStr));
+  const diff = str2arr(base64url.decode(diffStr));
   const charsIndexes: [string, number][] = [];
 
   let currDiff = 0;

@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@msgpack/msgpack": "^1.10.0",
+    "base64url": "^3.0.1",
     "bootstrap": "^4.4.1",
     "css-loader": "^3.2.0",
     "html-loader": "^0.5.5",
