@@ -1,9 +1,10 @@
 import * as Util from "addon/content/util";
+import { stripContent, diffContent } from "addon/content/strip";
 
 export const getActiveContent = () => {
-  return Util.stripContent(
+  return (
     (document.activeElement as HTMLInputElement).value ||
-      (document.activeElement as HTMLElement).innerText,
+    (document.activeElement as HTMLElement).innerText
   );
 };
 
@@ -51,13 +52,14 @@ const formatMarkdown = (signatureUrl: string) => {
   return signatureUrl;
 };
 
-const formatSignature = (content: string, signature: string, publicKey: string) => {
+const formatSignature = (content: string, diff: string, signature: string, publicKey: string) => {
   const a = content[0];
   const b = content[content.length - 1];
   const c = content.length;
+  const d = encodeURIComponent(diff);
   const s = encodeURIComponent(signature);
   const k = encodeURIComponent(publicKey);
-  const url = `${Util.SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&s=${s}&k=${k}`;
+  const url = `${Util.SIGN_HOST}/v/?a=${a}&b=${b}&c=${c}&d=${d}&s=${s}&k=${k}`;
   return `\n\n${formatMarkdown(url)}`;
 };
 
@@ -69,11 +71,10 @@ export const writeActiveSignature = (
   const activeElement = document.activeElement;
   if (!activeElement) return;
 
-  const content = getActiveContent();
-
-  const contentElement = findContentElement(activeElement as HTMLElement, content);
-
-  const signatureUrl = formatSignature(signedContent, signature, publicKey);
+  const strippedContent = stripContent(signedContent);
+  const diff = diffContent(signedContent);
+  const contentElement = findContentElement(activeElement as HTMLElement, signedContent);
+  const signatureUrl = formatSignature(strippedContent, diff, signature, publicKey);
 
   if ((contentElement as HTMLInputElement).value) {
     (contentElement as HTMLInputElement).value += signatureUrl;

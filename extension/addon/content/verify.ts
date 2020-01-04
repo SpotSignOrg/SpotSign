@@ -1,5 +1,6 @@
 import { MessageTarget, MessageType, sendToBackground } from "addon/lib/messages";
 import * as Util from "addon/content/util";
+import { stripContent, undiffContent } from "addon/content/strip";
 
 const verifySignature = async (content: string, signature: string, publicKey: string) => {
   const response = await sendToBackground({
@@ -46,7 +47,7 @@ const findSignatureElements = (nodes: NodeList) => {
 
 export const verifySignatures = async (documentContent: string, nodes: NodeList) => {
   const signaturesElements = findSignatureElements(nodes);
-  const strippedContent = Util.stripContent(documentContent);
+  const strippedContent = stripContent(documentContent);
 
   for (const [signatureUrl, signatureElements] of signaturesElements.entries()) {
     const signatureMatches = Array.from(signatureUrl.matchAll(Util.SIGNATURES_RE));
@@ -55,28 +56,24 @@ export const verifySignatures = async (documentContent: string, nodes: NodeList)
       const a = signatureMatch[1];
       const b = signatureMatch[2];
       const c = parseInt(signatureMatch[3]);
-      const signature = unescape(signatureMatch[4]);
-      const publicKey = unescape(signatureMatch[5]);
+      const diff = unescape(signatureMatch[4]);
+      const signature = unescape(signatureMatch[5]);
+      const publicKey = unescape(signatureMatch[6]);
       let verification;
 
-      if (c === 1) {
-        const content = a;
+      const contentRe = new RegExp(
+        `(?=(${Util.escapeRegExp(a)}[\\s\\S]{${c - 2}}${Util.escapeRegExp(b)}))`,
+        "gm",
+      );
+
+      const contentMatches = Array.from(strippedContent.matchAll(contentRe));
+
+      for (const contentMatch of contentMatches) {
+        const strippedContent = contentMatch[1];
+        const content = undiffContent(strippedContent, diff);
         verification = await verifySignature(content, signature, publicKey);
-      } else if (c === 2) {
-        const content = `${a}${b}`;
-        verification = await verifySignature(content, signature, publicKey);
-      } else {
-        const contentRe = new RegExp(
-          `(?=(${Util.escapeRegExp(a)}[\\s\\S]{${c - 2}}${Util.escapeRegExp(b)}))`,
-          "gm",
-        );
-        const contentMatches = Array.from(strippedContent.matchAll(contentRe));
-        for (const contentMatch of contentMatches) {
-          const content = contentMatch[1];
-          verification = await verifySignature(content, signature, publicKey);
-          if (verification) {
-            break;
-          }
+        if (verification) {
+          break;
         }
       }
 

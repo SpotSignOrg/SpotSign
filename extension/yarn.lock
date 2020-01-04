@@ -25,6 +25,11 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@msgpack/msgpack@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@msgpack/msgpack/-/msgpack-1.10.0.tgz#f120822e641deef03aa0d2cfa2f257becd48d149"
+  integrity sha512-ts34h525mRgQkVZXOI+iWWwxumf2ewAkkYdTRWkb6mfmSaqXNBXBfJhPyERb7Rg/dJ4lsuAjC1U52ibob2GS0A==
+
 "@restart/context@^2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@restart/context/-/context-2.1.4.tgz#a99d87c299a34c28bd85bb489cb07bfd23149c02"
@@ -712,10 +717,23 @@ buffer@^4.3.0:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
+bufferview@~1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/bufferview/-/bufferview-1.0.1.tgz#7afd74a45f937fa422a1d338c08bbfdc76cd725d"
+  integrity sha1-ev10pF+Tf6QiodM4wIu/3HbNcl0=
+
 builtin-status-codes@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
+
+bytebuffer@~3:
+  version "3.5.5"
+  resolved "https://registry.yarnpkg.com/bytebuffer/-/bytebuffer-3.5.5.tgz#7a6faf1a13514b083f1fcf9541c4c9bfbe7e7fd3"
+  integrity sha1-em+vGhNRSwg/H8+VQcTJv75+f9M=
+  dependencies:
+    bufferview "~1"
+    long "~2 >=2.2.3"
 
 bytes@3.0.0:
   version "3.0.0"
@@ -2875,6 +2893,11 @@ loglevel@^1.6.4:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.6.tgz#0ee6300cc058db6b3551fa1c4bf73b83bb771312"
   integrity sha512-Sgr5lbboAUBo3eXCSPL4/KoVz3ROKquOjcctxmHIt+vol2DrqTQe3SwkKKuYhEiWB5kYa13YyopJ69deJ1irzQ==
 
+"long@~2 >=2.2.3":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-2.4.0.tgz#9fa180bb1d9500cdc29c4156766a1995e1f4524f"
+  integrity sha1-n6GAux2VAM3CnEFWdmoZleH0Uk8=
+
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
@@ -3841,6 +3864,13 @@ prr@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
+
+pson@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/pson/-/pson-2.0.0.tgz#9200a8b7954a53f0773e3668db0341264595387a"
+  integrity sha1-kgCot5VKU/B3PjZo2wNBJkWVOHo=
+  dependencies:
+    bytebuffer "~3"
 
 public-encrypt@^4.0.0:
   version "4.0.3"
