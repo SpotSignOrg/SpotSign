@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "alwaysStrict": true,
+    "baseUrl": ".",
+    "lib": ["es5"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist",
+    "paths": { "src/*": ["src/*"] },
+    "sourceMap": false,
+    "strictNullChecks": true,
+    "suppressExcessPropertyErrors": false,
+    "suppressImplicitAnyIndexErrors": false,
+    "target": "es5",
+    "typeRoots": ["./@types", "./node_modules/@types"]
+    // "noImplicitAny": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist/*", "node_modules"]
+}

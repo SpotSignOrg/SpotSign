@@ -1,0 +1,37 @@
+{
+  "name": "spotsign-api",
+  "version": "1.0.0",
+  "description": "SpotSign Digital Signatures API",
+  "main": "index.js",
+  "repository": "https://github.com/spotsignorg/spotsign",
+  "author": "Jared Lockhart",
+  "license": "MPL-2.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "lint": "eslint \"src/**\"",
+    "lint-fix": "eslint --fix \"src/**\"",
+    "deploy": "claudia update --api-module dist/app"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prefer-arrow": "^1.1.7",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "prettier": "^1.19.1",
+    "webpack": "^4.41.4",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@types/node": "^13.1.4",
+    "@types/node-fetch": "^2.5.4",
+    "claudia-api-builder": "^4.1.2",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.6.0",
+    "readline": "^1.3.0",
+    "typescript": "^3.7.4"
+  }
+}

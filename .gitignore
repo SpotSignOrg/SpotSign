@@ -13,3 +13,4 @@ node_modules/
 *.code-workspace
 *.map
 *.wasm
+yarn-error.log

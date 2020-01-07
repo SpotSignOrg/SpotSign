@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "spotsign-api-executor",
+    "name": "spotsign-api",
+    "region": "ca-central-1"
+  },
+  "api": {
+    "id": "iul2jyob2a",
+    "module": "dist/app"
+  }
+}
