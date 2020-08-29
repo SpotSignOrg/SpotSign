@@ -49,7 +49,10 @@ const arrayConcat = (a: Uint8Array, b: Uint8Array) => {
 };
 
 const getKeys = async () => {
-  const keyPair = await window.crypto.subtle.generateKey(ECDSA_KEY, true, ["sign", "verify"]);
+  const keyPair = (await window.crypto.subtle.generateKey(ECDSA_KEY, true, [
+    "sign",
+    "verify",
+  ])) as CryptoKeyPair;
 
   return {
     publicKey: await exportPublicKey(keyPair.publicKey),
