@@ -16,7 +16,9 @@ export const IdentityDisplay: React.FunctionComponent<{ identity: Identity }> = 
       <IdentityKeys identity={identity} />
       <Row>
         <Col className="text-right">
-          <Button onClick={() => dispatch(signContent(identity))}>Sign</Button>
+          <Button variant="link" onClick={() => dispatch(signContent(identity))}>
+            &#9998; Sign
+          </Button>
         </Col>
       </Row>
     </React.Fragment>

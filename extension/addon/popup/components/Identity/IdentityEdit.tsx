@@ -72,8 +72,10 @@ export const IdentityEdit: React.FunctionComponent<{ identity: Identity }> = ({ 
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Form.Group className="text-right">
-        <Button type="submit">Save</Button>
+      <Form.Group className="text-right pb-0 mb-0">
+        <Button variant="link" type="submit">
+          &#9660; Save
+        </Button>
       </Form.Group>
     </Form>
   );

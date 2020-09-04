@@ -2,6 +2,7 @@ import * as React from "react";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Collapse from "react-bootstrap/Collapse";
+import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
 import { Identity, useState } from "addon/popup/state";
@@ -15,33 +16,38 @@ export const IdentityManager: React.FunctionComponent<{ identity: Identity }> = 
   const ariaId = `${identity.publicKey}-collapse`;
 
   return (
-    <div className="alert alert-primary">
-      <Row>
-        <Col>
-          <h4
-            onClick={() => setOpen(!open)}
-            aria-controls={ariaId}
-            aria-expanded={open}
-            style={{
-              cursor: "pointer",
-            }}
-          >
-            {identity.name}
-          </h4>
-        </Col>
-        <Col className="text-right">
-          <Button onClick={() => dispatch(deleteIdentity(identity))}>X</Button>
-        </Col>
-      </Row>
-      <Collapse in={open}>
-        <div id={ariaId}>
-          {identity.edit ? (
-            <IdentityEdit identity={identity} />
-          ) : (
-            <IdentityDisplay identity={identity} />
-          )}
-        </div>
-      </Collapse>
-    </div>
+    <React.Fragment>
+      <Container className="py-3">
+        <Row>
+          <Col>
+            <strong
+              onClick={() => setOpen(!open)}
+              aria-controls={ariaId}
+              aria-expanded={open}
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              {identity.name}
+            </strong>
+          </Col>
+          <Col className="text-right">
+            <Button className="close" onClick={() => dispatch(deleteIdentity(identity))}>
+              <span aria-hidden="true">&times;</span>
+            </Button>
+          </Col>
+        </Row>
+        <Collapse in={open}>
+          <div id={ariaId} className="pt-3">
+            {identity.edit ? (
+              <IdentityEdit identity={identity} />
+            ) : (
+              <IdentityDisplay identity={identity} />
+            )}
+          </div>
+        </Collapse>
+      </Container>
+      <hr className="p-0 m-0" />
+    </React.Fragment>
   );
 };
