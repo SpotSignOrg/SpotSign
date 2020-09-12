@@ -29,7 +29,7 @@
     "@types/node": "^13.1.4",
     "@types/node-fetch": "^2.5.4",
     "claudia-api-builder": "^4.1.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "typescript": "^3.7.4"
   }
 }
